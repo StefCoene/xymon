@@ -18,6 +18,13 @@ static char rcsid[] = "$Id$";
 int main(int argc, char *argv[])
 {
 	int result = 1;
+
+	char *XYMSRV = NULL;
+	XYMSRV = getenv("XYMSRV");
+	if (!XYMSRV) {
+		XYMSRV = "127.0.0.1" ;
+	}
+
 	cgidata_t *cgidata = NULL;
 	sendreturn_t *sres;
 
@@ -25,7 +32,7 @@ int main(int argc, char *argv[])
 	if (cgidata) {
 		printf("Content-Type: application/octet-stream\n\n");
 		sres = newsendreturnbuf(1, stdout);
-		result = sendmessage(cgidata->value, "127.0.0.1", XYMON_TIMEOUT, sres);
+		result = sendmessage(cgidata->value, XYMSRV, XYMON_TIMEOUT, sres);
 	}
 
 	return result;
