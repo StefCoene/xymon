@@ -171,6 +171,16 @@ void grabdata(conn_t *conn)
 		conn->ctype = C_CLIENT_CLIENT;
 		conn->action = (client_response ? C_WRITING : C_DONE);
 	}
+	else if (strncmp(STRBUF(conn->msgbuf), "ping", 4) == 0) {
+		/* Tell them we're here */
+		char id[128];
+
+		snprintf(id, sizeof(id), "xymond %s\n", VERSION);
+
+		client_response = strdup(id);
+		conn->ctype = C_CLIENT_CLIENT;
+		conn->action = C_WRITING ;
+	}
 	else {
 		/* Message from a client, but not the "client" message. So no response. */
 		conn->ctype = C_CLIENT_OTHER;
