@@ -165,6 +165,18 @@ then
 fi
 echo ""; echo ""
 
+echo "What is the URL for the Xymon https interface for client communications? [/xymon-msg] ? "
+echo "(Note: This is a URL - NOT the filesystem directory)"
+if test -z "$XYMONMSGURL"
+then
+	read XYMONMSGURL
+fi
+if test -z "$XYMONMSGURL"
+then
+	XYMONMSGURL="/xymon-msg"
+fi
+echo ""; echo ""
+
 XYMONHOSTOS=`uname -s | tr '[A-Z]' '[a-z]'`
 
 echo "# Toplevel Makefile for Xymon"    > Makefile
@@ -189,6 +201,8 @@ echo "# Username running Xymon"          >>Makefile
 echo "XYMONUSER = $XYMONUSER"            >>Makefile
 echo "# Xymon server IP-address"         >>Makefile
 echo "XYMONHOSTIP = $XYMONHOSTIP"        >>Makefile
+echo "# URL for Xymon client MSG"        >>Makefile
+echo "XYMONMSGURL=$XYMONMSGURL"          >>Makefile
 echo "# Large File Support settings"     >>Makefile
 echo "LFSDEF = $LFS"                     >>Makefile
 echo "LIBRTDEF = $LIBRTDEF"              >>Makefile

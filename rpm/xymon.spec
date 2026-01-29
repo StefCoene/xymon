@@ -47,6 +47,7 @@ rm -rf $RPM_BUILD_ROOT
         XYMONHOSTURL=/xymon \
         CGIDIR=/usr/lib/xymon/cgi-bin \
         XYMONCGIURL=/xymon-cgi \
+        XYMONMSGURL=/xymon-msg \
         SECURECGIDIR=/usr/lib/xymon/cgi-secure \
         SECUREXYMONCGIURL=/xymon-seccgi \
         HTTPDGID=apache \

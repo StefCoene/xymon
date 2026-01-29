@@ -27,7 +27,7 @@ COMMONTOOLS=xymon xymoncmd xymongrep xymoncfg xymondigest
 all: $(PROGRAMS) $(COMMONTOOLS) xymonclient.cfg clientlaunch.cfg $(EXTRATOOLS)
 
 xymonclient.cfg: xymonclient.cfg.DIST
-	cat xymonclient.cfg.DIST | sed -e 's!@XYMONHOSTIP@!$(XYMONHOSTIP)!g' >xymonclient.cfg
+	cat xymonclient.cfg.DIST | sed -e 's!@XYMONHOSTIP@!$(XYMONHOSTIP)!g' | sed -e 's!@XYMONMSGURL@!$(XYMONMSGURL)!g' >xymonclient.cfg
 	../build/bb-commands.sh >>xymonclient.cfg
 
 clientlaunch.cfg: clientlaunch.cfg.DIST
@@ -69,11 +69,14 @@ install:
 	if test ! -d $(INSTALLROOT)$(XYMONHOME)/logs  ; then mkdir -p $(INSTALLROOT)$(XYMONHOME)/logs  ; chmod 755 $(INSTALLROOT)$(XYMONHOME)/logs ; fi
 	if test ! -d $(INSTALLROOT)$(XYMONHOME)/ext   ; then mkdir -p $(INSTALLROOT)$(XYMONHOME)/ext   ; chmod 755 $(INSTALLROOT)$(XYMONHOME)/ext  ; fi
 	if test ! -d $(INSTALLROOT)$(XYMONHOME)/local ; then mkdir -p $(INSTALLROOT)$(XYMONHOME)/local ; chmod 755 $(INSTALLROOT)$(XYMONHOME)/local; fi
+	if test ! -f $(INSTALLROOT)$(XYMONHOME)/etc/curl.cfg ; then cp curl.cfg $(INSTALLROOT)$(XYMONHOME)/etc/ ; chmod 644 $(INSTALLROOT)$(XYMONHOME)/etc/curl.cfg; fi
+	if test ! -f $(INSTALLROOT)$(XYMONHOME)/etc/wget.cfg ; then cp wget.cfg $(INSTALLROOT)$(XYMONHOME)/etc/ ; chmod 644 $(INSTALLROOT)$(XYMONHOME)/etc/wget.cfg; fi
 	if test ! -f $(INSTALLROOT)$(XYMONHOME)/etc/localclient.cfg ; then cp localclient.cfg $(INSTALLROOT)$(XYMONHOME)/etc/ ; chmod 644 $(INSTALLROOT)$(XYMONHOME)/etc/localclient.cfg; fi
 	if test ! -f $(INSTALLROOT)$(XYMONHOME)/local/README; then cp README-local $(INSTALLROOT)$(XYMONHOME)/local/README ; chmod 644 $(INSTALLROOT)$(XYMONHOME)/local/README; fi
-	chmod 755 runclient.sh $(PROGRAMS) xymonclient*.sh $(COMMONTOOLS) $(EXTRATOOLS)
+	chmod 755 runclient.sh $(PROGRAMS) xymonclient*.sh $(COMMONTOOLS) $(EXTRATOOLS) xymon-wget.sh xymon-curl.sh
 	cp -fp runclient.sh $(INSTALLROOT)$(XYMONHOME)
-	cp -fp $(PROGRAMS) xymonclient*.sh $(COMMONTOOLS) $(EXTRATOOLS) $(INSTALLROOT)$(XYMONHOME)/bin/
+	cp -fp $(PROGRAMS) xymonclient*.sh $(COMMONTOOLS) $(EXTRATOOLS) xymon-wget.sh xymon-curl.sh $(INSTALLROOT)$(XYMONHOME)/bin/
+	cp -fp ext/configure.sh $(INSTALLROOT)$(XYMONHOME)/ext/
 
 	../build/merge-sects clientlaunch.cfg $(INSTALLROOT)$(XYMONHOME)/etc/clientlaunch.cfg
 	../build/merge-lines xymonclient.cfg $(INSTALLROOT)$(XYMONHOME)/etc/xymonclient.cfg

@@ -87,6 +87,15 @@ ScriptAlias @SECUREXYMONCGIURL@/ "@SECURECGIDIR@/"
     </RequireAll>
 </Directory>
 
+ScriptAlias @XYMONMSGURL@ "@XYMONHOME@/bin/xymoncgimsg.cgi"
+<Location "@XYMONHOME@/bin/xymoncgimsg.cgi">
+   Options ExecCGI
+   AuthType Basic
+   AuthName "Xymon Monitoring Client"
+   AuthUserFile "@INSTALLETCDIR@/clienthtpasswd"
+   Require valid-user
+</Location>
+
 # Rewrite-rules for migrating from the URL's used in Hobbit
 RewriteEngine On
 

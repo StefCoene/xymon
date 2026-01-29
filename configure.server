@@ -294,6 +294,18 @@ then
 fi
 echo ""; echo ""
 
+echo "What is the URL for the Xymon https interface for client communications? [/xymon-msg] ? "
+echo "(Note: This is a URL - NOT the filesystem directory)"
+if test -z "$XYMONMSGURL"
+then
+	read XYMONMSGURL
+fi
+if test -z "$XYMONMSGURL"
+then
+	XYMONMSGURL="/xymon-msg"
+fi
+echo ""; echo ""
+
 echo "********************** SECURITY NOTICE ****************************"
 echo "If your Xymon server is accessible by outsiders, then you should"
 echo "restrict access to the CGI scripts that handle enable/disable of"
@@ -440,6 +452,8 @@ echo "# URL for Xymon CGIs"              >>Makefile
 echo "XYMONCGIURL = $XYMONCGIURL"        >>Makefile
 echo "# URL for Xymon Admin CGIs"        >>Makefile
 echo "SECUREXYMONCGIURL = $SECUREXYMONCGIURL"  >>Makefile
+echo "# URL for Xymon client MSG"        >>Makefile
+echo "XYMONMSGURL=$XYMONMSGURL"          >>Makefile
 echo "# Webserver group-ID"              >>Makefile
 echo "HTTPDGID=$HTTPDGID"                >>Makefile
 echo ""                                  >>Makefile
