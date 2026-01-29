@@ -10,7 +10,11 @@
 
 static char memory_rcsid[] = "$Id$";
 
-static char *memory_params[]      = { "DS:realmempct:GAUGE:600:0:U", NULL };
+static char *memory_params_pct[]  = { "DS:realmempct:GAUGE:600:0:U", NULL };
+static void *memory_tpl_pct       = NULL;
+static char *memory_params[]      = { "DS:usedmem:GAUGE:600:0:U",
+                                      "DS:totalmem:GAUGE:600:0:U",
+                                      NULL };
 static void *memory_tpl           = NULL;
 
 /*
@@ -22,7 +26,7 @@ static void *memory_tpl           = NULL;
 void * memhosts;
 int memhosts_init = 0;
 
-static int get_mem_percent(char *l)
+static int get_percent(char *l)
 {
 	char *p;
 
@@ -33,46 +37,97 @@ static int get_mem_percent(char *l)
 	return atoi(p+1);
 }
 
-void do_memory_rrd_update(time_t tstamp, char *hostname, char *testname, char *classname, char *pagepaths, int physval, int swapval, int actval)
+static int get_mem_percent(char *l, int* used, int* total )
 {
-	if (memory_tpl == NULL) memory_tpl = setup_template(memory_params);
+   char *str1, *str2, *str3 ;
+
+          strtok (l," ") ;
+   str1 = strtok (NULL, " ") ;
+   str2 = strtok (NULL, " ") ;
+   str3 = strtok (NULL, " ") ;
+
+   if (str1 == NULL) return 0;
+   if (str2 == NULL) return 0;
+   if (str3 == NULL) return 0;
+
+   int length ;
+
+   // Strip M from string
+   length = strlen(str1) ;
+   str1[length - 1] = '\0' ;
+
+   // Strip M from string
+   length = strlen(str2) ;
+   str2[length - 1] = '\0' ;
+
+   // Strip % from string
+   length = strlen(str3) ;
+   str3[length - 1] = '\0' ;
+
+   *used       = atoi (str1) ;
+   *total      = atoi (str2) ;
+   int percent = atoi (str3) ;
+
+   return percent ;
+}
+
+void do_memory_rrd_update_pct(time_t tstamp, char *hostname, char *testname, char *classname, char *pagepaths, int physval_pct, int swapval_pct, int actval_pct)
+{
+	if (memory_tpl_pct == NULL) memory_tpl_pct = setup_template(memory_params_pct);
 
 	setupfn2("%s.%s.rrd", "memory", "real");
-	snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, physval);
-	create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+	snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, physval_pct);
+	create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 	setupfn2("%s.%s.rrd", "memory", "swap");
-	snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, swapval);
-	create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+	snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, swapval_pct);
+	create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
-	if (actval >= 0) {
+	if (actval_pct >= 0) {
 		setupfn2("%s.%s.rrd", "memory", "actual");
-		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, actval);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, actval_pct);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 	}
+}
+
+void do_memory_rrd_update(time_t tstamp, char *hostname, char *testname, char *classname, char *pagepaths, int physval_used, int swapval_used, int actval_used, int physval_total, int swapval_total, int actval_total)
+{
+   if (memory_tpl == NULL) memory_tpl = setup_template(memory_params);
+
+   setupfn2("%s.%s.rrd", "absolute-memory", "real");
+   snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d:%d", (int)tstamp, physval_used, physval_total);
+   create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+
+   setupfn2("%s.%s.rrd", "absolute-memory", "swap");
+   snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d:%d", (int)tstamp, swapval_used, swapval_total);
+   create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+
+   setupfn2("%s.%s.rrd", "absolute-memory", "actual");
+   snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d:%d", (int)tstamp, actval_used, actval_total);
+   create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
 }
 
 /* bb-xsnmp.pl memory update - Marco Avvisano */
 void do_memory_rrd_update_router(time_t tstamp, char *hostname, char *testname, char *classname, char *pagepaths, int procval, int ioval, int fastval)
 {
-	if (memory_tpl == NULL) memory_tpl = setup_template(memory_params);
+	if (memory_tpl_pct == NULL) memory_tpl_pct = setup_template(memory_params_pct);
 
 	if ((procval >= 0) && (procval <= 100)) { 
 		setupfn2("%s.%s.rrd", "memory", "processor");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, procval);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 	}
 
 	if ((ioval >= 0) && (ioval <= 100)) {  
 		setupfn2("%s.%s.rrd", "memory", "io");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, ioval);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 	}
 
 	if ((fastval >= 0) && (fastval <= 100)) {
 		setupfn2("%s.%s.rrd", "memory", "fast");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, fastval);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 	}
 }
 
@@ -125,23 +180,23 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 			sscanf(p, "%ld %ld %ld %d", &j1, &j2, &j3, &esqautil);
                 	}
 
-		if (memory_tpl == NULL) memory_tpl = setup_template(memory_params);
+		if (memory_tpl_pct == NULL) memory_tpl_pct = setup_template(memory_params_pct);
 
 		setupfn2("%s.%s.rrd", "memory", "CSA");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, csautil);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 		setupfn2("%s.%s.rrd", "memory", "ECSA");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, ecsautil);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 		setupfn2("%s.%s.rrd", "memory", "SQA");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, sqautil);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 		setupfn2("%s.%s.rrd", "memory", "ESQA");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, esqautil);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 		return 0;
 	}	  
@@ -155,11 +210,11 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 			sscanf(p, "%f%%", &pctused);
                 	}
 
-		if (memory_tpl == NULL) memory_tpl = setup_template(memory_params);
+		if (memory_tpl_pct == NULL) memory_tpl_pct = setup_template(memory_params_pct);
 
 		setupfn2("%s.%s.rrd", "memory", "vsize");
 		snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, (int)pctused);
-		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+		create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 
 		return 0;
 	}	  
@@ -187,18 +242,18 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 			int procval = -1, ioval = -1, fastval = -1;
 
 			eoln = strchr(proc, '\n'); if (eoln) *eoln = '\0';
-			procval = get_mem_percent(proc);
+			procval = get_percent(proc);
 			if (eoln) *eoln = '\n';
 
 			if (io) {
 				eoln = strchr(io, '\n'); if (eoln) *eoln = '\0';
-				ioval = get_mem_percent(io);
+				ioval = get_percent(io);
 				if (eoln) *eoln = '\n';
 			}
 
 			if (fast) {
 				eoln = strchr(fast, '\n'); if (eoln) *eoln = '\0';
-				fastval = get_mem_percent(fast);
+				fastval = get_percent(fast);
 				if (eoln) *eoln = '\n';
 			}
 
@@ -229,7 +284,7 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 				val = atoi(p+1);
 				setupfn2("%s.%s.rrd", "memory", "tcb");
 				snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, val);
-				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 			}
 		}
 
@@ -240,7 +295,7 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 				val = atoi(p+1);
 				setupfn2("%s.%s.rrd", "memory", "dcb");
 				snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, val);
-				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 			}
 		}
 
@@ -251,7 +306,7 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 				val = atoi(p+1);
 				setupfn2("%s.%s.rrd", "memory", "ltch");
 				snprintf(rrdvalues, sizeof(rrdvalues), "%d:%d", (int)tstamp, val);
-				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params, memory_tpl);
+				create_and_update_rrd(hostname, testname, classname, pagepaths, memory_params_pct, memory_tpl_pct);
 			}
 		}
 
@@ -264,25 +319,28 @@ int do_memory_rrd(char *hostname, char *testname, char *classname, char *pagepat
 
 		if (phys) {
 			char *eoln;
-			int physval = -1, swapval = -1, actval = -1;
+			int physval_pct = -1, swapval_pct = -1, actval_pct = -1;
+			int physval_used = -1, swapval_used = -1, actval_used = -1;
+			int physval_total = -1, swapval_total = -1, actval_total = -1;
 
 			eoln = strchr(phys, '\n'); if (eoln) *eoln = '\0';
-			physval = get_mem_percent(phys);
+			physval_pct = get_mem_percent(phys, &physval_used, &physval_total);
 			if (eoln) *eoln = '\n';
 
 			if (swap) {
 				eoln = strchr(swap, '\n'); if (eoln) *eoln = '\0';
-				swapval = get_mem_percent(swap);
+				swapval_pct = get_mem_percent(swap, &swapval_used, &swapval_total);
 				if (eoln) *eoln = '\n';
 			}
 
 			if (actual) {
 				eoln = strchr(actual, '\n'); if (eoln) *eoln = '\0';
-				actval = get_mem_percent(actual);
+				actval_pct = get_mem_percent(actual, &actval_used, &actval_total);
 				if (eoln) *eoln = '\n';
 			}
 
-			do_memory_rrd_update(tstamp, hostname, testname, classname, pagepaths, physval, swapval, actval);
+			do_memory_rrd_update_pct(tstamp, hostname, testname, classname, pagepaths, physval_pct, swapval_pct, actval_pct);
+			do_memory_rrd_update(tstamp, hostname, testname, classname, pagepaths, physval_used, swapval_used, actval_used, physval_total, swapval_total, actval_total);
 		}
 	}
 

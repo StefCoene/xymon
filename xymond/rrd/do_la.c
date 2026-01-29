@@ -260,7 +260,7 @@ done_parsing:
 			pagetotal = pagetotal / 100;
 			realuse = 100 - (physavail / phystotal);
 			swapuse = 100 - (pageavail / pagetotal);
-			do_memory_rrd_update(tstamp, hostname, testname, classname, pagepaths, realuse, swapuse, -1);
+			do_memory_rrd_update_pct(tstamp, hostname, testname, classname, pagepaths, realuse, swapuse, -1);
 		}
 		else if (overflow) {
 			errprintf("Host %s cpu report overflows in memory usage calculation\n", hostname);
