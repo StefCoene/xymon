@@ -13,6 +13,11 @@
 # reachable, with the same content, through the skin's links. The SVGs are
 # served as pages' images, so none may carry a script.
 #
+# The info, trends and client columns are not tests, so the shipped
+# xymonserver.cfg gives each its own icon instead of the green status one;
+# each of INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF must name such
+# an icon that the install put in gifs, or those columns show a broken image.
+#
 # Installed for real into a scratch tree, as install-empty-ext-dir.sh does
 # and for the same reasons, so the links are checked where they land.
 
@@ -45,6 +50,18 @@ vars=(
 gifs=$dest/var/www/gifs
 [ -d "$gifs" ] || fail "the install did not create $gifs"
 
+cfg=$dest/etc/xymonserver.cfg
+[ -f "$cfg" ] || fail "the install did not create $cfg"
+for var in INFOCOLUMNGIF TRENDSCOLUMNGIF CLIENTCOLUMNGIF; do
+	val=$(sed -n "s/^$var=\"\([^\"]*\)\".*/\1/p" "$cfg")
+	[ -n "$val" ] || fail "the installed xymonserver.cfg sets no $var"
+	case "$val" in
+	green.*|yellow.*|red.*|purple.*|clear.*|blue.*|unknown.*|*-recent.*|*-ack.*)
+		fail "$var=\"$val\" in the installed xymonserver.cfg is a status icon, not one for that column" ;;
+	esac
+	[ -f "$gifs/$val" ] || fail "$var=\"$val\" in the installed xymonserver.cfg, but the install put no $val in gifs"
+done
+
 skins=$(cd "$ROOT/xymond/wwwfiles/skins" && for d in */; do printf '%s\n' "${d%/}"; done)
 [ -n "$skins" ] || fail "no skin directories under xymond/wwwfiles/skins"
 
@@ -72,4 +89,4 @@ for s in $skins; do
 	done
 done
 
-pass "every installed skin has all $checked icons in SVG, and reaches the backgrounds, favicons and stylesheet of gifs"
+pass "the info, trends and client columns have their own installed icon, and every installed skin has all $checked icons in SVG and reaches the backgrounds, favicons and stylesheet of gifs"

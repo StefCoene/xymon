@@ -90,6 +90,16 @@ Defines the name of the column for the "info" pages.
 .IP "\fBTRENDSCOLUMN\fR"
 Defines the name of the column for the RRD graph pages.
 
+.IP "\fBINFOCOLUMNGIF\fR, \fBTRENDSCOLUMNGIF\fR, \fBCLIENTCOLUMNGIF\fR"
+The image shown in the info, trends and client columns: a file in the
+XYMONSKIN directory, named with its extension, which IMAGEFILETYPE
+does not change. The shipped xymonserver.cfg sets them to "info.gif",
+"trends.gif" and "clientlog.gif", an icon of its own for each column;
+without a setting, the column shows the green status icon.
+An upgrade keeps the values an existing xymonserver.cfg has, so an
+installation that had "green.gif" keeps the green icon until these
+are changed.
+
 .IP "\fBRRDHEIGHT\fR"
 The default height (in pixels) of the RRD graph images.
 Default: 120 pixels.
@@ -349,11 +359,9 @@ URL prefix (without hostname) of the Xymon graphics. E.g. "/xymon/gifs".
 Two other icon sets are installed beside the default one, in SVG:
 "$XYMONSERVERWWWURL/skins/accessible", where every status has its own
 shape as well as its own color, and "$XYMONSERVERWWWURL/skins/vector".
-To use one, set XYMONSKIN to it and IMAGEFILETYPE to "svg". Set
-INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF, the image of the
-info, trends and client columns, to "green.svg" as well: they name
-the file with its extension, and the shipped xymonserver.cfg sets
-them to "green.gif".
+To use one, set XYMONSKIN to it and IMAGEFILETYPE to "svg", and set
+INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF to "info.svg",
+"trends.svg" and "clientlog.svg".
 
 .IP "\fBXYMONHELPSKIN\fR"
 URL prefix (without hostname) of the Xymon on-line help files. E.g "/xymon/help".

@@ -121,6 +121,18 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
   <dd>Defines the name of the column for the RRD graph pages.
     <p class="Pp"></p>
   </dd>
+  <dt id="INFOCOLUMNGIF"><a class="permalink" href="#INFOCOLUMNGIF"><b>INFOCOLUMNGIF</b>,
+    <b>TRENDSCOLUMNGIF</b>, <b>CLIENTCOLUMNGIF</b></a></dt>
+  <dd>The image shown in the info, trends and client columns: a file in the
+      XYMONSKIN directory, named with its extension, which IMAGEFILETYPE does
+      not change. The shipped xymonserver.cfg sets them to &quot;info.gif&quot;,
+      &quot;trends.gif&quot; and &quot;clientlog.gif&quot;, an icon of its own
+      for each column; without a setting, the column shows the green status
+      icon. An upgrade keeps the values an existing xymonserver.cfg has, so an
+      installation that had &quot;green.gif&quot; keeps the green icon until
+      these are changed.
+    <p class="Pp"></p>
+  </dd>
   <dt id="RRDHEIGHT"><a class="permalink" href="#RRDHEIGHT"><b>RRDHEIGHT</b></a></dt>
   <dd>The default height (in pixels) of the RRD graph images. Default: 120
       pixels.
@@ -432,11 +444,9 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
       default one, in SVG: &quot;$XYMONSERVERWWWURL/skins/accessible&quot;,
       where every status has its own shape as well as its own color, and
       &quot;$XYMONSERVERWWWURL/skins/vector&quot;. To use one, set XYMONSKIN to
-      it and IMAGEFILETYPE to &quot;svg&quot;. Set INFOCOLUMNGIF,
-      TRENDSCOLUMNGIF and CLIENTCOLUMNGIF, the image of the info, trends and
-      client columns, to &quot;green.svg&quot; as well: they name the file with
-      its extension, and the shipped xymonserver.cfg sets them to
-      &quot;green.gif&quot;.
+      it and IMAGEFILETYPE to &quot;svg&quot;, and set INFOCOLUMNGIF,
+      TRENDSCOLUMNGIF and CLIENTCOLUMNGIF to &quot;info.svg&quot;,
+      &quot;trends.svg&quot; and &quot;clientlog.svg&quot;.
     <p class="Pp"></p>
   </dd>
   <dt id="XYMONHELPSKIN"><a class="permalink" href="#XYMONHELPSKIN"><b>XYMONHELPSKIN</b></a></dt>

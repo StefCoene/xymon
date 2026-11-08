@@ -2,7 +2,8 @@ Alternative icon sets ("skins") for the Xymon web pages.
 
 Each directory here is a complete skin: every status icon in the
 "gifs" directory (<colour>, <colour>-recent, <colour>-ack, unknown,
-unknown-recent), the event-log arrow and the graph zoom icon, as SVG.
+unknown-recent), the icons of the info, trends and client columns,
+the event-log arrow and the graph zoom icon, as SVG.
 The page backgrounds, the favicons and xymonbody.css are links to
 the files in "gifs", so a skin only replaces the icons.
 
@@ -10,13 +11,12 @@ To use one, set in xymonserver.cfg:
 
 	XYMONSKIN="$XYMONSERVERWWWURL/skins/accessible"
 	IMAGEFILETYPE="svg"
-	INFOCOLUMNGIF="green.svg"
-	TRENDSCOLUMNGIF="green.svg"
-	CLIENTCOLUMNGIF="green.svg"
+	INFOCOLUMNGIF="info.svg"
+	TRENDSCOLUMNGIF="trends.svg"
+	CLIENTCOLUMNGIF="clientlog.svg"
 
 The last three name the image of the info, trends and client columns
-with its extension; the shipped xymonserver.cfg sets them to
-"green.gif", which a skin does not have.
+with its extension, so IMAGEFILETYPE does not change them.
 
 Then wait for the next xymongen run. The status pages from the CGIs
 change at once. See xymonserver.cfg(5) for both settings.
