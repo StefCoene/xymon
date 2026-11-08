@@ -30,6 +30,11 @@ vector: flat icons, a different symbol for each colour. A recent
     change is a filled circle with a face; an acknowledged one is a
     check mark in the status colour.
 
+In both sets, the icons that move in "gifs" move too -- red, yellow,
+purple and the recent red, yellow, purple and blue -- with a CSS
+animation in the SVG, which stops when the browser is set to reduce
+motion.
+
 Both sets: Copyright (C) 2026 Stef Coene. Distributed under the same
 terms as Xymon, the GNU General Public License version 2; see the
 file COPYING.

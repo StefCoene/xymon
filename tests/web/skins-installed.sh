@@ -11,7 +11,10 @@
 # live page, so each installed skin is checked against the installed gifs:
 # every icon there as an SVG of the same name, and every other file there
 # reachable, with the same content, through the skin's links. The SVGs are
-# served as pages' images, so none may carry a script.
+# served as pages' images, so none may carry a script. An icon that moves in
+# gifs -- an animated GIF, which carries a NETSCAPE2.0 loop block -- moves in
+# every skin too, with a CSS animation, and every animation stops when the
+# browser asks for reduced motion.
 #
 # The info, trends and client columns are not tests, so the shipped
 # xymonserver.cfg gives each its own icon instead of the green status one;
@@ -83,10 +86,16 @@ for s in $skins; do
 			[ -f "$svg" ] || fail "skin '$s' has no ${name%.gif}.svg, the icon gifs has as $name"
 			grep -q '<svg' "$svg" || fail "skin '$s' ${svg##*/} is not an SVG image"
 			if grep -qi '<script' "$svg"; then fail "skin '$s' ${svg##*/} carries a script"; fi
+			if grep -q NETSCAPE2.0 "$f" && ! grep -q '@keyframes' "$svg"; then
+				fail "skin '$s' ${svg##*/} stands still, while $name in gifs moves"
+			fi
+			if grep -q '@keyframes' "$svg" && ! grep -q 'prefers-reduced-motion' "$svg"; then
+				fail "skin '$s' ${svg##*/} moves, but does not stop for prefers-reduced-motion"
+			fi
 			checked=$((checked + 1))
 			;;
 		esac
 	done
 done
 
-pass "the info, trends and client columns have their own installed icon, and every installed skin has all $checked icons in SVG and reaches the backgrounds, favicons and stylesheet of gifs"
+pass "the info, trends and client columns have their own installed icon, and every installed skin has all $checked icons in SVG, moving where gifs moves, and reaches the backgrounds, favicons and stylesheet of gifs"
