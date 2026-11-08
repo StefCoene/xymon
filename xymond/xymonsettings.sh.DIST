@@ -10,6 +10,7 @@
 
 XYMONHOME="${XYMONHOME:-@XYMONHOME@}"
 CFG="$XYMONHOME/etc/xymonserver.cfg"
+WWWDIR=""
 ADD=0
 
 ME=`basename "$0"`
@@ -18,9 +19,12 @@ usage() {
 	cat <<EOF
 Usage: $ME [-c FILE] get NAME...
        $ME [-c FILE] [-a] set NAME=VALUE...
+       $ME [-c FILE] [-w DIR] skins
+       $ME [-c FILE] [-w DIR] skin NAME
 
   -c FILE  the settings file (default: $XYMONHOME/etc/xymonserver.cfg)
   -a       with set: add a NAME the file does not have yet
+  -w DIR   the web directory (default: XYMONWWWDIR from the settings file)
 EOF
 	exit 2
 }
@@ -114,38 +118,8 @@ changes() {
 	done
 }
 
-while getopts c:a opt; do
-	case "$opt" in
-	c) CFG="$OPTARG" ;;
-	a) ADD=1 ;;
-	*) usage ;;
-	esac
-done
-shift `expr $OPTIND - 1`
-
-[ $# -ge 1 ] || usage
-CMD="$1"; shift
-
-[ -f "$CFG" ] || die "cannot read $CFG"
-
-case "$CMD" in
-get)
-	[ $# -ge 1 ] || usage
-	rc=0
-	for n in "$@"; do
-		validname "$n" || die "'$n' is not a setting name"
-		if v=`getval "$n"`; then
-			if [ $# -gt 1 ]; then printf '%s=%s\n' "$n" "$v"; else printf '%s\n' "$v"; fi
-		else
-			echo "$ME: $n is not set in $CFG" >&2
-			rc=1
-		fi
-	done
-	exit $rc
-	;;
-
-set)
-	[ $# -ge 1 ] || usage
+# Change NAME=VALUE... as "set" does; see there.
+doset() {
 	[ -w "$CFG" ] || die "cannot write $CFG"
 
 	spec="$CFG.xymonsettings.$$.spec"
@@ -222,6 +196,104 @@ set)
 	echo "Programs read the settings when they start: xymongen and the CGIs"
 	echo "use the new values at their next run, the daemons once Xymon is"
 	echo "restarted."
+}
+
+# The web directory: -w, or XYMONWWWDIR as the programs see it, with its
+# "$NAME" references expanded by xymoncmd, which loads the file as they do.
+wwwdir() {
+	if [ -n "$WWWDIR" ]; then echo "$WWWDIR"; return 0; fi
+	[ -x "$XYMONHOME/bin/xymoncmd" ] || die "cannot find the web directory; give it with -w"
+	d=`"$XYMONHOME/bin/xymoncmd" --env="$CFG" env 2>/dev/null | sed -n 's/^XYMONWWWDIR=//p'`
+	[ -n "$d" ] || die "XYMONWWWDIR is not set in $CFG; give the web directory with -w"
+	echo "$d"
+}
+
+# The directory of skin NAME under web directory $1: "classic" is gifs.
+skindir() {
+	if [ "$2" = "classic" ]; then echo "$1/gifs"; else echo "$1/skins/$2"; fi
+}
+
+# The image type of the skin in directory $1: the first type it has a
+# green status icon in.
+skintype() {
+	for t in svg png gif jpg; do
+		[ -f "$1/green.$t" ] && { echo $t; return 0; }
+	done
+	return 1
+}
+
+while getopts c:aw: opt; do
+	case "$opt" in
+	c) CFG="$OPTARG" ;;
+	a) ADD=1 ;;
+	w) WWWDIR="$OPTARG" ;;
+	*) usage ;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+[ $# -ge 1 ] || usage
+CMD="$1"; shift
+
+[ -f "$CFG" ] || die "cannot read $CFG"
+
+case "$CMD" in
+get)
+	[ $# -ge 1 ] || usage
+	rc=0
+	for n in "$@"; do
+		validname "$n" || die "'$n' is not a setting name"
+		if v=`getval "$n"`; then
+			if [ $# -gt 1 ]; then printf '%s=%s\n' "$n" "$v"; else printf '%s\n' "$v"; fi
+		else
+			echo "$ME: $n is not set in $CFG" >&2
+			rc=1
+		fi
+	done
+	exit $rc
+	;;
+
+set)
+	[ $# -ge 1 ] || usage
+	doset "$@"
+	;;
+
+skins)
+	[ $# -eq 0 ] || usage
+	www=`wwwdir` || exit 1
+	cur=`getval XYMONSKIN` || cur=""
+	for name in classic `ls "$www/skins" 2>/dev/null`; do
+		dir=`skindir "$www" "$name"`
+		[ -d "$dir" ] || continue
+		t=`skintype "$dir"` || continue
+		if [ "$name" = "classic" ]; then url='$XYMONSERVERWWWURL/gifs'; else url="\$XYMONSERVERWWWURL/skins/$name"; fi
+		if [ "$cur" = "$url" ]; then mark="*"; else mark=" "; fi
+		printf '%s %-12s %s\n' "$mark" "$name" "$t"
+	done
+	;;
+
+skin)
+	[ $# -eq 1 ] || usage
+	name="$1"
+	case "$name" in
+	''|*/*|.*) die "'$name' is not a skin name" ;;
+	esac
+	www=`wwwdir` || exit 1
+	dir=`skindir "$www" "$name"`
+	[ -d "$dir" ] || die "there is no skin '$name': $dir does not exist; see '$ME skins'"
+	t=`skintype "$dir"` || die "skin '$name' has no status icons in $dir"
+	if [ "$name" = "classic" ]; then url='$XYMONSERVERWWWURL/gifs'; else url="\$XYMONSERVERWWWURL/skins/$name"; fi
+	# A column icon the skin lacks shows the green status icon, as the
+	# columns did before they had their own.
+	set -- "XYMONSKIN=$url" "IMAGEFILETYPE=$t"
+	for col in INFO:info TRENDS:trends CLIENT:clientlog; do
+		var=`expr "$col" : '\([^:]*\):'`COLUMNGIF
+		f=`expr "$col" : '[^:]*:\(.*\)'`.$t
+		[ -f "$dir/$f" ] || f=green.$t
+		set -- "$@" "$var=$f"
+	done
+	ADD=1
+	doset "$@"
 	;;
 
 *)

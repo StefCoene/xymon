@@ -7,7 +7,9 @@ the event-log arrow and the graph zoom icon, as SVG.
 The page backgrounds, the favicons and xymonbody.css are links to
 the files in "gifs", so a skin only replaces the icons.
 
-To use one, set in xymonserver.cfg:
+To use one, run "xymonsettings.sh skin accessible" (or vector, or
+classic for the icons in "gifs"), which sets these in xymonserver.cfg;
+see xymonsettings(8):
 
 	XYMONSKIN="$XYMONSERVERWWWURL/skins/accessible"
 	IMAGEFILETYPE="svg"
