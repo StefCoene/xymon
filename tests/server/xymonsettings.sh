@@ -23,7 +23,9 @@
 # IMAGEFILETYPE and the three column icons -- at the gifs directory
 # ("classic") or a directory under skins/, taking the image type from the
 # icons the skin has, and "skins" lists them and marks the one in use. The
-# web directory comes from XYMONWWWDIR as xymoncmd expands it.
+# web directory comes from XYMONWWWDIR as xymoncmd expands it. "animation
+# off" points XYMONSKIN at the static variant of the set in use and "on"
+# back at the set, and "skin" keeps that choice when the new set can.
 #
 # Run on a copy of the shipped xymonserver.cfg.DIST and of the shipped gifs
 # and skins, through /bin/sh, as an administrator would run the installed
@@ -113,10 +115,10 @@ ln -s "$XYMONCMD" "$work/bin/xymoncmd"
 xs -c "$cfg" set "XYMONHOME=$work" XYMONSERVERWWWURL=/xymon >/dev/null
 
 list=$(XYMONHOME=$work xs skins)
-assert_equal "* classic      gif
-  accessible   svg
+assert_equal "* classic      gif  static  (in use)
+  accessible   svg  static
   plain        png
-  vector       svg" "$list" "skins lists gifs as classic and every skin with icons, and marks the one in use"
+  vector       svg  static" "$list" "skins lists gifs as classic and every skin with icons, which have a static variant, and marks the one in use"
 
 XYMONHOME=$work xs skin vector >/dev/null
 got=$(xs -c "$cfg" get XYMONSKIN IMAGEFILETYPE INFOCOLUMNGIF TRENDSCOLUMNGIF CLIENTCOLUMNGIF)
@@ -126,7 +128,7 @@ INFOCOLUMNGIF=info.svg
 TRENDSCOLUMNGIF=trends.svg
 CLIENTCOLUMNGIF=clientlog.svg' "$got" "skin vector"
 assert_equal /xymon/skins/vector "$(loaded XYMONSKIN)" "xymoncmd reads the XYMONSKIN skin wrote"
-assert_contains "* vector" "$(XYMONHOME=$work xs skins)" "skins marks the skin just chosen"
+assert_contains "* vector       svg  static  (in use)" "$(XYMONHOME=$work xs skins)" "skins marks the skin just chosen"
 
 xs -c "$cfg" -w "$work/www" skin plain >/dev/null
 got=$(xs -c "$cfg" get IMAGEFILETYPE INFOCOLUMNGIF)
@@ -141,6 +143,34 @@ INFOCOLUMNGIF=info.gif
 TRENDSCOLUMNGIF=trends.gif
 CLIENTCOLUMNGIF=clientlog.gif' "$got" "skin classic goes back to gifs and the shipped column icons"
 
+# animation off and on: the static variant of the skin in use, and back;
+# a skin chosen while the icons stand still stands still too, when it can.
+xs -c "$cfg" -w "$work/www" animation off >/dev/null
+assert_equal '$XYMONSERVERWWWURL/gifs/static' "$(xs -c "$cfg" get XYMONSKIN)" "animation off on classic"
+assert_contains "* classic      gif  static  (in use, static)" "$(xs -c "$cfg" -w "$work/www" skins)" \
+	"skins shows the set in use standing still"
+xs -c "$cfg" -w "$work/www" skin vector >/dev/null
+got=$(xs -c "$cfg" get XYMONSKIN IMAGEFILETYPE INFOCOLUMNGIF)
+assert_equal 'XYMONSKIN=$XYMONSERVERWWWURL/skins/vector/static
+IMAGEFILETYPE=svg
+INFOCOLUMNGIF=info.svg' "$got" "skin vector while the icons stand still"
+xs -c "$cfg" -w "$work/www" animation on >/dev/null
+assert_equal '$XYMONSERVERWWWURL/skins/vector' "$(xs -c "$cfg" get XYMONSKIN)" "animation on on vector"
+
+xs -c "$cfg" -w "$work/www" animation off >/dev/null
+msg=$(xs -c "$cfg" -w "$work/www" skin plain 2>&1 >/dev/null)
+assert_contains "no static variant" "$msg" "skin plain while the icons stand still says it cannot"
+assert_equal '$XYMONSERVERWWWURL/skins/plain' "$(xs -c "$cfg" get XYMONSKIN)" "skin plain falls back to its moving icons"
+cp "$cfg" "$work/before.cfg"
+st=0; xs -c "$cfg" -w "$work/www" animation off >/dev/null 2>&1 || st=$?
+assert_equal 1 "$st" "animation off on a skin without a static variant"
+xs -c "$cfg" set XYMONSKIN=/elsewhere >/dev/null
+cp "$cfg" "$work/before.cfg"
+st=0; xs -c "$cfg" -w "$work/www" animation off >/dev/null 2>&1 || st=$?
+assert_equal 1 "$st" "animation off while XYMONSKIN points at none of the installed sets"
+cmp -s "$work/before.cfg" "$cfg" || fail "a refused animation command changed the file"
+xs -c "$cfg" -w "$work/www" skin classic >/dev/null
+
 cp "$cfg" "$work/before.cfg"
 for bad in nosuch empty ../etc; do
 	st=0; xs -c "$cfg" -w "$work/www" skin "$bad" >/dev/null 2>&1 || st=$?
@@ -151,4 +181,4 @@ cmp -s "$work/before.cfg" "$cfg" || fail "a refused skin changed the file"
 leftover=$(cd "$work/etc" && ls | grep -v '^xymonserver.cfg$' || true)
 [ -z "$leftover" ] || fail "set left files behind next to the config: $leftover"
 
-pass "xymonsettings reads values unexpanded, changes only the lines asked for or nothing at all, and lists and picks skins"
+pass "xymonsettings reads values unexpanded, changes only the lines asked for or nothing at all, lists and picks skins, and switches their animation"

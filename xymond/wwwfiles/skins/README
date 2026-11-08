@@ -40,8 +40,9 @@ motion.
 For pages that should not move at all, every set has a "static"
 directory with the same icons standing still: point XYMONSKIN at
 "$XYMONSERVERWWWURL/skins/accessible/static", for instance, or at
-"$XYMONSERVERWWWURL/gifs/static" for the default icons. Everything in
-it that does not move is a link to the file one level up.
+"$XYMONSERVERWWWURL/gifs/static" for the default icons, or run
+"xymonsettings.sh animation off". Everything in it that does not move
+is a link to the file one level up.
 
 Both sets: Copyright (C) 2026 Stef Coene. Distributed under the same
 terms as Xymon, the GNU General Public License version 2; see the

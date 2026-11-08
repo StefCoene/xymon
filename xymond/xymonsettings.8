@@ -9,6 +9,8 @@ xymonsettings.sh \- show and change settings in xymonserver.cfg
 .B "xymonsettings.sh [\-c FILE] [\-w DIR] skins"
 .br
 .B "xymonsettings.sh [\-c FILE] [\-w DIR] skin NAME"
+.br
+.B "xymonsettings.sh [\-c FILE] [\-w DIR] animation on|off"
 
 .SH DESCRIPTION
 xymonsettings.sh reads and changes the settings in
@@ -52,7 +54,9 @@ refused, none is applied.
 
 .IP "\fBskins\fR"
 List the icon sets ("skins") a \fBskin\fR command can choose, with the
-image type of each, and mark the one XYMONSKIN points at with "*".
+image type of each and "static" when it has a static variant, and
+mark the one XYMONSKIN points at with "*", noting when its static
+variant is in use.
 "classic" is the "gifs" directory in the web directory; every other
 name is a directory under "skins" there that has a green status icon.
 
@@ -64,7 +68,16 @@ type of its icons, the first of svg, png, gif and jpg that it has a
 green.TYPE in. INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF are
 set to the skin's info.TYPE, trends.TYPE and clientlog.TYPE, or to
 green.TYPE for a column icon the skin does not have. A setting the
-file does not have yet is added.
+file does not have yet is added. When the set in use is its static
+variant, NAME's static variant is chosen too; a set without one is
+used with its moving icons, and a warning says so.
+
+.IP "\fBanimation\fR on|off"
+Make the icons of the set in use move, or stand still: \fBoff\fR points
+XYMONSKIN at the set's "static" directory, which has the same icons
+standing still, and \fBon\fR back at the set itself. Refused when
+XYMONSKIN points at none of the installed sets, or, for \fBoff\fR, when
+the set has no static variant.
 
 .SH OPTIONS
 .IP "\fB\-c\fR FILE"
@@ -76,7 +89,7 @@ With \fBset\fR: add a NAME the file does not have yet, as a new line
 at the end of the file.
 
 .IP "\fB\-w\fR DIR"
-With \fBskins\fR and \fBskin\fR: the web directory that holds "gifs"
+With \fBskins\fR, \fBskin\fR and \fBanimation\fR: the web directory that holds "gifs"
 and "skins". Default: XYMONWWWDIR from the settings file, as
 xymoncmd(1) expands it.
 
@@ -92,6 +105,7 @@ xymonsettings.sh set STATUSLIFETIME=60
 xymonsettings.sh set XYMONPAGEACKFONT='COLOR="#33ebf4" SIZE="\-1"'
 xymonsettings.sh skins
 xymonsettings.sh skin accessible
+xymonsettings.sh animation off
 .fi
 
 .SH "SEE ALSO"

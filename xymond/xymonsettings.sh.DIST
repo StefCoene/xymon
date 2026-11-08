@@ -21,6 +21,7 @@ Usage: $ME [-c FILE] get NAME...
        $ME [-c FILE] [-a] set NAME=VALUE...
        $ME [-c FILE] [-w DIR] skins
        $ME [-c FILE] [-w DIR] skin NAME
+       $ME [-c FILE] [-w DIR] animation on|off
 
   -c FILE  the settings file (default: $XYMONHOME/etc/xymonserver.cfg)
   -a       with set: add a NAME the file does not have yet
@@ -216,10 +217,50 @@ skindir() {
 # The image type of the skin in directory $1: the first type it has a
 # green status icon in.
 skintype() {
-	for t in svg png gif jpg; do
-		[ -f "$1/green.$t" ] && { echo $t; return 0; }
+	for st_type in svg png gif jpg; do
+		[ -f "$1/green.$st_type" ] && { echo $st_type; return 0; }
 	done
 	return 1
+}
+
+# The XYMONSKIN value for skin NAME ($1), its static variant when $2 is 1.
+skinurl() {
+	if [ "$1" = "classic" ]; then u='$XYMONSERVERWWWURL/gifs'; else u="\$XYMONSERVERWWWURL/skins/$1"; fi
+	if [ "$2" = 1 ]; then echo "$u/static"; else echo "$u"; fi
+}
+
+# Which installed set XYMONSKIN points at: prints "NAME STATIC", or
+# nothing when it is not one of them.
+currentskin() {
+	cur=`getval XYMONSKIN` || return 0
+	case "$cur" in
+	'$XYMONSERVERWWWURL/gifs') echo "classic 0" ;;
+	'$XYMONSERVERWWWURL/gifs/static') echo "classic 1" ;;
+	'$XYMONSERVERWWWURL/skins/'*/static)
+		n=`expr "x$cur" : 'x\$XYMONSERVERWWWURL/skins/\(.*\)/static'`; echo "$n 1" ;;
+	'$XYMONSERVERWWWURL/skins/'*)
+		n=`expr "x$cur" : 'x\$XYMONSERVERWWWURL/skins/\(.*\)'`; echo "$n 0" ;;
+	esac
+}
+
+# Point the settings at skin NAME ($2) in web directory $1, at its static
+# variant when $3 is 1: XYMONSKIN, IMAGEFILETYPE and the column icons.
+applyskin() {
+	dir=`skindir "$1" "$2"`
+	[ -d "$dir" ] || die "there is no skin '$2': $dir does not exist; see '$ME skins'"
+	if [ "$3" = 1 ]; then dir="$dir/static"; fi
+	t=`skintype "$dir"` || die "skin '$2' has no status icons in $dir"
+	# A column icon the skin lacks shows the green status icon, as the
+	# columns did before they had their own.
+	set -- "XYMONSKIN=`skinurl "$2" "$3"`" "IMAGEFILETYPE=$t"
+	for col in INFO:info TRENDS:trends CLIENT:clientlog; do
+		var=`expr "$col" : '\([^:]*\):'`COLUMNGIF
+		f=`expr "$col" : '[^:]*:\(.*\)'`.$t
+		[ -f "$dir/$f" ] || f=green.$t
+		set -- "$@" "$var=$f"
+	done
+	ADD=1
+	doset "$@"
 }
 
 while getopts c:aw: opt; do
@@ -261,14 +302,19 @@ set)
 skins)
 	[ $# -eq 0 ] || usage
 	www=`wwwdir` || exit 1
-	cur=`getval XYMONSKIN` || cur=""
+	set -- `currentskin`
+	curname="${1:-}"; curstatic="${2:-0}"
 	for name in classic `ls "$www/skins" 2>/dev/null`; do
 		dir=`skindir "$www" "$name"`
 		[ -d "$dir" ] || continue
 		t=`skintype "$dir"` || continue
-		if [ "$name" = "classic" ]; then url='$XYMONSERVERWWWURL/gifs'; else url="\$XYMONSERVERWWWURL/skins/$name"; fi
-		if [ "$cur" = "$url" ]; then mark="*"; else mark=" "; fi
-		printf '%s %-12s %s\n' "$mark" "$name" "$t"
+		if skintype "$dir/static" >/dev/null; then still="static"; else still=""; fi
+		mark=" "; note=""
+		if [ "$name" = "$curname" ]; then
+			mark="*"
+			if [ "$curstatic" = 1 ]; then note="(in use, static)"; else note="(in use)"; fi
+		fi
+		printf '%s %-12s %-4s %-7s %s\n' "$mark" "$name" "$t" "$still" "$note" | sed 's/ *$//'
 	done
 	;;
 
@@ -279,21 +325,33 @@ skin)
 	''|*/*|.*) die "'$name' is not a skin name" ;;
 	esac
 	www=`wwwdir` || exit 1
-	dir=`skindir "$www" "$name"`
-	[ -d "$dir" ] || die "there is no skin '$name': $dir does not exist; see '$ME skins'"
-	t=`skintype "$dir"` || die "skin '$name' has no status icons in $dir"
-	if [ "$name" = "classic" ]; then url='$XYMONSERVERWWWURL/gifs'; else url="\$XYMONSERVERWWWURL/skins/$name"; fi
-	# A column icon the skin lacks shows the green status icon, as the
-	# columns did before they had their own.
-	set -- "XYMONSKIN=$url" "IMAGEFILETYPE=$t"
-	for col in INFO:info TRENDS:trends CLIENT:clientlog; do
-		var=`expr "$col" : '\([^:]*\):'`COLUMNGIF
-		f=`expr "$col" : '[^:]*:\(.*\)'`.$t
-		[ -f "$dir/$f" ] || f=green.$t
-		set -- "$@" "$var=$f"
-	done
-	ADD=1
-	doset "$@"
+	# Keep the animation as it is: a set in use standing still makes the
+	# new one stand still too, when it has a static variant.
+	set -- `currentskin`
+	static="${2:-0}"
+	if [ "$static" = 1 ]; then
+		skintype "`skindir "$www" "$name"`/static" >/dev/null || {
+			echo "$ME: skin '$name' has no static variant; using its moving icons" >&2
+			static=0
+		}
+	fi
+	applyskin "$www" "$name" "$static"
+	;;
+
+animation)
+	[ $# -eq 1 ] || usage
+	case "$1" in
+	on) static=0 ;;
+	off) static=1 ;;
+	*) usage ;;
+	esac
+	www=`wwwdir` || exit 1
+	set -- `currentskin`
+	[ -n "${1:-}" ] || die "XYMONSKIN does not point at one of the installed skins; choose one with '$ME skin NAME' first"
+	if [ "$static" = 1 ]; then
+		skintype "`skindir "$www" "$1"`/static" >/dev/null || die "skin '$1' has no static variant"
+	fi
+	applyskin "$www" "$1" "$static"
 	;;
 
 *)

@@ -26,7 +26,9 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
   <br/>
   <b>xymonsettings.sh [-c FILE] [-w DIR] skins</b>
   <br/>
-  <b>xymonsettings.sh [-c FILE] [-w DIR] skin NAME</b></p>
+  <b>xymonsettings.sh [-c FILE] [-w DIR] skin NAME</b>
+  <br/>
+  <b>xymonsettings.sh [-c FILE] [-w DIR] animation on|off</b></p>
 <p class="Pp"></p>
 </section>
 <section class="Sh">
@@ -76,10 +78,11 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
   </dd>
   <dt id="skins"><a class="permalink" href="#skins"><b>skins</b></a></dt>
   <dd>List the icon sets (&quot;skins&quot;) a <b>skin</b> command can choose,
-      with the image type of each, and mark the one XYMONSKIN points at with
-      &quot;*&quot;. &quot;classic&quot; is the &quot;gifs&quot; directory in
-      the web directory; every other name is a directory under &quot;skins&quot;
-      there that has a green status icon.
+      with the image type of each and &quot;static&quot; when it has a static
+      variant, and mark the one XYMONSKIN points at with &quot;*&quot;, noting
+      when its static variant is in use. &quot;classic&quot; is the
+      &quot;gifs&quot; directory in the web directory; every other name is a
+      directory under &quot;skins&quot; there that has a green status icon.
     <p class="Pp"></p>
   </dd>
   <dt id="skin"><a class="permalink" href="#skin"><b>skin</b> NAME</a></dt>
@@ -90,7 +93,18 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
       green.TYPE in. INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF are set
       to the skin's info.TYPE, trends.TYPE and clientlog.TYPE, or to green.TYPE
       for a column icon the skin does not have. A setting the file does not have
-      yet is added.
+      yet is added. When the set in use is its static variant, NAME's static
+      variant is chosen too; a set without one is used with its moving icons,
+      and a warning says so.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="animation"><a class="permalink" href="#animation"><b>animation</b>
+    on|off</a></dt>
+  <dd>Make the icons of the set in use move, or stand still: <b>off</b> points
+      XYMONSKIN at the set's &quot;static&quot; directory, which has the same
+      icons standing still, and <b>on</b> back at the set itself. Refused when
+      XYMONSKIN points at none of the installed sets, or, for <b>off</b>, when
+      the set has no static variant.
     <p class="Pp"></p>
   </dd>
 </dl>
@@ -110,9 +124,9 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
     <p class="Pp"></p>
   </dd>
   <dt id="w"><a class="permalink" href="#w"><b>-w</b> DIR</a></dt>
-  <dd>With <b>skins</b> and <b>skin</b>: the web directory that holds
-      &quot;gifs&quot; and &quot;skins&quot;. Default: XYMONWWWDIR from the
-      settings file, as <a href="../man1/xymoncmd.1.html">xymoncmd</a>(1) expands it.
+  <dd>With <b>skins</b>, <b>skin</b> and <b>animation</b>: the web directory
+      that holds &quot;gifs&quot; and &quot;skins&quot;. Default: XYMONWWWDIR
+      from the settings file, as <a href="../man1/xymoncmd.1.html">xymoncmd</a>(1) expands it.
     <p class="Pp"></p>
   </dd>
 </dl>
@@ -132,7 +146,8 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
 xymonsettings.sh set STATUSLIFETIME=60
 xymonsettings.sh set XYMONPAGEACKFONT='COLOR=&quot;#33ebf4&quot; SIZE=&quot;-1&quot;'
 xymonsettings.sh skins
-xymonsettings.sh skin accessible</pre>
+xymonsettings.sh skin accessible
+xymonsettings.sh animation off</pre>
 <p class="Pp"></p>
 </section>
 <section class="Sh">
