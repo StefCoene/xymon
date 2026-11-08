@@ -1,0 +1,230 @@
+#!/bin/sh
+#
+# xymonsettings - show and change settings in xymonserver.cfg on an
+# installed Xymon server. See xymonsettings(8).
+#
+# Copyright (C) 2026 Stef Coene
+#
+# This program is released under the GNU General Public License (GPL),
+# version 2. See the file "COPYING" for details.
+
+XYMONHOME="${XYMONHOME:-@XYMONHOME@}"
+CFG="$XYMONHOME/etc/xymonserver.cfg"
+ADD=0
+
+ME=`basename "$0"`
+
+usage() {
+	cat <<EOF
+Usage: $ME [-c FILE] get NAME...
+       $ME [-c FILE] [-a] set NAME=VALUE...
+
+  -c FILE  the settings file (default: $XYMONHOME/etc/xymonserver.cfg)
+  -a       with set: add a NAME the file does not have yet
+EOF
+	exit 2
+}
+
+die() {
+	echo "$ME: $*" >&2
+	exit 1
+}
+
+validname() {
+	case "$1" in
+	''|[!A-Za-z_]*|*[!A-Za-z0-9_]*) return 1 ;;
+	esac
+	return 0
+}
+
+# Shared awk functions. They read a line the way loadenv() and
+# sanitize_input() in lib/ do, so a value means here what it means to every
+# Xymon program: leading blanks and an "export " are skipped, a backslash
+# escapes the next character, a '#' outside quotes starts a comment, and one
+# pair of double quotes around the value is removed. "$NAME" references are
+# left as they are; the programs expand them when they load the file.
+AWKLIB='
+# Length of the blanks and "export " in front of the name.
+function prefixlen(l,   p, r) {
+	match(l, /^[ \t]*/); p = RLENGTH; r = substr(l, p + 1)
+	if (substr(r, 1, 6) == "export" && (substr(r, 7, 1) == " " || substr(r, 7, 1) == "\t")) {
+		r = substr(r, 7); match(r, /^[ \t]*/); p += 6 + RLENGTH
+	}
+	return p
+}
+# Position of the "#" that starts a comment in s, or 0.
+function commentpos(s,   i, c, inq, n) {
+	inq = 0; n = length(s); i = 1
+	while (i <= n) {
+		c = substr(s, i, 1)
+		if (c == "\\") { i += 2; continue }
+		if (c == "\"" || c == "\047") inq = 1 - inq
+		else if (c == "#" && !inq) return i
+		i++
+	}
+	return 0
+}
+# The value a program sees, from the text after "NAME=".
+function loaded(raw,   p, s, out, i, c, n) {
+	p = commentpos(raw); s = p ? substr(raw, 1, p - 1) : raw
+	sub(/[ \t\r]+$/, "", s)
+	out = ""; n = length(s)
+	for (i = 1; i <= n; i++) {
+		c = substr(s, i, 1)
+		if (c == "\\") { i++; c = substr(s, i, 1) }
+		out = out c
+	}
+	if (substr(out, 1, 1) == "\"") {
+		out = substr(out, 2)
+		if (substr(out, length(out), 1) == "\"") out = substr(out, 1, length(out) - 1)
+	}
+	return out
+}
+# The text to write after "NAME=" so that a program sees v.
+function quoted(v,   out, i, c, n) {
+	out = ""; n = length(v)
+	for (i = 1; i <= n; i++) {
+		c = substr(v, i, 1)
+		if (c == "\\" || c == "\"" || c == "\047") out = out "\\"
+		out = out c
+	}
+	return "\"" out "\""
+}
+'
+
+# Print the value of NAME from the last line that sets it, which is the
+# one that counts, as a program sees it before expanding "$NAME".
+getval() {
+	awk -v n="$1" "$AWKLIB"'
+	{
+		l = substr($0, prefixlen($0) + 1)
+		if (index(l, n "=") != 1) next
+		val = loaded(substr(l, length(n) + 2)); found = 1
+	}
+	END { if (found) print val; exit(found ? 0 : 1) }' "$CFG"
+}
+
+# Print "NAME: OLD -> NEW" for each NAME=VALUE, OLD from the file as it is.
+changes() {
+	for a in "$@"; do
+		n=`expr "x$a" : 'x\([^=]*\)='`
+		v=`expr "x$a" : 'x[^=]*=\(.*\)'`
+		old=`getval "$n"` || old="(not set)"
+		printf '%s: %s -> %s\n' "$n" "$old" "$v"
+	done
+}
+
+while getopts c:a opt; do
+	case "$opt" in
+	c) CFG="$OPTARG" ;;
+	a) ADD=1 ;;
+	*) usage ;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+[ $# -ge 1 ] || usage
+CMD="$1"; shift
+
+[ -f "$CFG" ] || die "cannot read $CFG"
+
+case "$CMD" in
+get)
+	[ $# -ge 1 ] || usage
+	rc=0
+	for n in "$@"; do
+		validname "$n" || die "'$n' is not a setting name"
+		if v=`getval "$n"`; then
+			if [ $# -gt 1 ]; then printf '%s=%s\n' "$n" "$v"; else printf '%s\n' "$v"; fi
+		else
+			echo "$ME: $n is not set in $CFG" >&2
+			rc=1
+		fi
+	done
+	exit $rc
+	;;
+
+set)
+	[ $# -ge 1 ] || usage
+	[ -w "$CFG" ] || die "cannot write $CFG"
+
+	spec="$CFG.xymonsettings.$$.spec"
+	new="$CFG.xymonsettings.$$"
+	trap 'rm -f "$spec" "$new"' 0
+	trap 'exit 1' 1 2 13 15
+	: >"$spec" || die "cannot create $spec"
+
+	# Check every assignment before changing anything, so a typo in the
+	# third one does not leave the first two applied.
+	for a in "$@"; do
+		case "$a" in
+		*=*) ;;
+		*) die "'$a' is not NAME=VALUE" ;;
+		esac
+		case "$a" in
+		*'
+'*) die "the value in '$a' contains a newline" ;;
+		esac
+		n=`expr "x$a" : 'x\([^=]*\)='`
+		v=`expr "x$a" : 'x[^=]*=\(.*\)'`
+		validname "$n" || die "'$n' is not a setting name"
+		if [ $ADD -eq 0 ]; then
+			getval "$n" >/dev/null || die "$n is not in $CFG; check the name, or use -a to add it"
+		fi
+		printf '%s\n%s\n' "$n" "$v" >>"$spec"
+	done
+
+	# Rewrite every line that sets one of the names, keeping what stands
+	# before the name and the comment after the value; append the names
+	# the file did not have. The values are read from a file rather than
+	# passed with -v, which would interpret their backslashes.
+	awk "$AWKLIB"'
+	NR == FNR {
+		if (FNR % 2) { name = $0; order[++cnt] = name }
+		else val[name] = $0
+		next
+	}
+	{
+		p = prefixlen($0); pre = substr($0, 1, p); l = substr($0, p + 1)
+		for (k = 1; k <= cnt; k++) {
+			n = order[k]
+			if (index(l, n "=") != 1) continue
+			rest = substr(l, length(n) + 2)
+			c = commentpos(rest); tail = ""
+			if (c) {
+				ws = substr(rest, 1, c - 1); sub(/^.*[^ \t]/, "", ws)
+				tail = ws substr(rest, c)
+			}
+			$0 = pre n "=" quoted(val[n]) tail
+			seen[n] = 1
+			break
+		}
+		print
+	}
+	END {
+		for (k = 1; k <= cnt; k++) {
+			n = order[k]
+			if (!seen[n]) print n "=" quoted(val[n])
+		}
+	}' "$spec" "$CFG" >"$new" || die "could not rewrite $CFG"
+
+	# What changes, worked out from the file as it was and reported only
+	# once the file is written: a reader that stops reading early, such
+	# as "| head", then cannot stop the change half-way.
+	report=`changes "$@"`
+
+	# Copy over the original rather than rename, so its owner, its mode
+	# and a symlink to it stay as they are.
+	cat "$new" >"$CFG" || die "could not write $CFG"
+	rm -f "$spec" "$new"
+
+	printf '%s\n' "$report"
+	echo "Programs read the settings when they start: xymongen and the CGIs"
+	echo "use the new values at their next run, the daemons once Xymon is"
+	echo "restarted."
+	;;
+
+*)
+	usage
+	;;
+esac

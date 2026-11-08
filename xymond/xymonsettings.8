@@ -1,0 +1,70 @@
+.TH XYMONSETTINGS 8 "Version 4.3.31:  6 Nov 2026" "Xymon"
+.SH NAME
+xymonsettings.sh \- show and change settings in xymonserver.cfg
+.SH SYNOPSIS
+.B "xymonsettings.sh [\-c FILE] get NAME..."
+.br
+.B "xymonsettings.sh [\-c FILE] [\-a] set NAME=VALUE..."
+
+.SH DESCRIPTION
+xymonsettings.sh reads and changes the settings in
+.I xymonserver.cfg(5)
+on an installed Xymon server, without opening the file in an editor.
+
+Both commands work with a value as a Xymon program sees it. In the
+file, a backslash escapes the next character, a "#" outside quotes
+starts a comment, and one pair of double quotes around the value is
+removed when it is loaded. \fBget\fR undoes that, and \fBset\fR adds the
+backslashes a value needs, so a value can hold double quotes, a "#"
+or a backslash as it is. A reference to another setting, such as
+"$XYMONSERVERWWWURL", is shown and written as it stands: the programs
+replace it when they load the file.
+
+Programs read xymonserver.cfg when they start. After a \fBset\fR,
+xymongen(1) and the CGI programs use the new value at their next run;
+the programs that keep running, such as xymond(8) and its channel
+workers, use it once Xymon has been restarted.
+
+.SH COMMANDS
+.IP "\fBget\fR NAME..."
+Print the value of each NAME, from the last line in the file that
+sets it, which is the one the programs use. With one NAME, only the
+value is printed; with more, one NAME=VALUE line for each. A NAME
+the file does not set is reported on stderr, and the exit status is
+then 1.
+
+.IP "\fBset\fR NAME=VALUE..."
+Change each NAME to VALUE. Every line that sets NAME is rewritten:
+what stands before the name, such as "export ", and the comment
+after the value are kept, and every other line of the file stays as
+it is. The file is overwritten in place, so its owner, its mode and
+a symbolic link pointing to it are kept.
+
+A NAME the file does not have yet is refused, so a misspelt name
+does not add a setting that nothing reads; use \fB\-a\fR to add it.
+All assignments are checked before the file is changed: when one is
+refused, none is applied.
+
+.SH OPTIONS
+.IP "\fB\-c\fR FILE"
+The file to read and change. Default: $XYMONHOME/etc/xymonserver.cfg,
+the file xymon.sh starts Xymon with.
+
+.IP "\fB\-a\fR"
+With \fBset\fR: add a NAME the file does not have yet, as a new line
+at the end of the file.
+
+.SH LIMITATIONS
+Only the lines of the file itself are read and changed: a setting
+from a file it includes, and the "AREA/NAME=" and "NAME+=" forms,
+are left alone. A value cannot hold a newline.
+
+.SH EXAMPLES
+.nf
+xymonsettings.sh get XYMONSKIN
+xymonsettings.sh set STATUSLIFETIME=60
+xymonsettings.sh set XYMONPAGEACKFONT='COLOR="#33ebf4" SIZE="\-1"'
+.fi
+
+.SH "SEE ALSO"
+xymonserver.cfg(5), xymoncmd(1), xymon(7)

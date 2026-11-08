@@ -9,7 +9,7 @@ XYMONCOMMLIBS = $(XYMONCOMMLIB) $(ZLIBLIBS) $(SSLLIBS) $(NETLIBS) $(LIBRTDEF)
 XYMONTIMELIB = ../lib/libxymontime.a
 XYMONTIMELIBS = $(XYMONTIMELIB) $(LIBRTDEF)
 
-PROGRAMS = xymon.sh xymond xymond_channel xymond_locator xymond_filestore xymond_history xymond_alert xymond_sample xymond_client xymond_hostdata xymond_capture xymond_distribute xymonfetch xymon-mailack trimhistory combostatus xymonreports.sh moverrd.sh convertnk rrdcachectl
+PROGRAMS = xymon.sh xymond xymond_channel xymond_locator xymond_filestore xymond_history xymond_alert xymond_sample xymond_client xymond_hostdata xymond_capture xymond_distribute xymonfetch xymon-mailack trimhistory combostatus xymonreports.sh moverrd.sh xymonsettings.sh convertnk rrdcachectl
 CLIENTPROGRAMS = ../client/xymond_client
 
 ifeq ($(DORRD),yes)
@@ -134,6 +134,10 @@ xymonreports.sh: xymonreports.sh.DIST
 
 moverrd.sh: moverrd.sh.DIST
 	cat $< | sed -e 's!@XYMONHOME@!$(XYMONHOME)!g' | sed -e 's!@XYMONVAR@!$(XYMONVAR)!g' >$@
+	chmod 755 $@
+
+xymonsettings.sh: xymonsettings.sh.DIST
+	cat $< | sed -e 's!@XYMONHOME@!$(XYMONHOME)!g' >$@
 	chmod 755 $@
 
 ifeq ($(XYMONCGIURL),$(SECUREXYMONCGIURL))

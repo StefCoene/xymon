@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="../mandoc.css" type="text/css" media="all"/>
+  <title>XYMONSETTINGS(8)</title>
+</head>
+<body>
+<h1 class="head-name">XYMONSETTINGS</h1>
+Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#INDEX">Index</a>
+<a href="../index.html">Return to Main Contents</a><hr/>
+
+<div class="manual-text">
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="NAME"><a class="permalink" href="#NAME">NAME</a></h1>
+<p class="Pp">xymonsettings.sh - show and change settings in xymonserver.cfg</p>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="SYNOPSIS"><a class="permalink" href="#SYNOPSIS">SYNOPSIS</a></h1>
+<p class="Pp"><b>xymonsettings.sh [-c FILE] get NAME...</b>
+  <br/>
+  <b>xymonsettings.sh [-c FILE] [-a] set NAME=VALUE...</b></p>
+<p class="Pp"></p>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="DESCRIPTION"><a class="permalink" href="#DESCRIPTION">DESCRIPTION</a></h1>
+<p class="Pp">xymonsettings.sh reads and changes the settings in
+    <i><a href="../man5/xymonserver.cfg.5.html">xymonserver.cfg</a>(5)</i> on an installed Xymon server, without opening the
+    file in an editor.</p>
+<p class="Pp">Both commands work with a value as a Xymon program sees it. In the
+    file, a backslash escapes the next character, a &quot;#&quot; outside quotes
+    starts a comment, and one pair of double quotes around the value is removed
+    when it is loaded. <b>get</b> undoes that, and <b>set</b> adds the
+    backslashes a value needs, so a value can hold double quotes, a
+    &quot;#&quot; or a backslash as it is. A reference to another setting, such
+    as &quot;$XYMONSERVERWWWURL&quot;, is shown and written as it stands: the
+    programs replace it when they load the file.</p>
+<p class="Pp">Programs read xymonserver.cfg when they start. After a <b>set</b>,
+    <a href="../man1/xymongen.1.html">xymongen</a>(1) and the CGI programs use the new value at their next run; the
+    programs that keep running, such as <a href="../man8/xymond.8.html">xymond</a>(8) and its channel workers, use
+    it once Xymon has been restarted.</p>
+<p class="Pp"></p>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="COMMANDS"><a class="permalink" href="#COMMANDS">COMMANDS</a></h1>
+<dl class="Bl-tag">
+  <dt id="get"><a class="permalink" href="#get"><b>get</b> NAME...</a></dt>
+  <dd>Print the value of each NAME, from the last line in the file that sets it,
+      which is the one the programs use. With one NAME, only the value is
+      printed; with more, one NAME=VALUE line for each. A NAME the file does not
+      set is reported on stderr, and the exit status is then 1.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="set"><a class="permalink" href="#set"><b>set</b>
+    NAME=VALUE...</a></dt>
+  <dd>Change each NAME to VALUE. Every line that sets NAME is rewritten: what
+      stands before the name, such as &quot;export &quot;, and the comment after
+      the value are kept, and every other line of the file stays as it is. The
+      file is overwritten in place, so its owner, its mode and a symbolic link
+      pointing to it are kept.
+    <p class="Pp">A NAME the file does not have yet is refused, so a misspelt
+        name does not add a setting that nothing reads; use <b>-a</b> to add it.
+        All assignments are checked before the file is changed: when one is
+        refused, none is applied.</p>
+    <p class="Pp"></p>
+  </dd>
+</dl>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="OPTIONS"><a class="permalink" href="#OPTIONS">OPTIONS</a></h1>
+<dl class="Bl-tag">
+  <dt id="c"><a class="permalink" href="#c"><b>-c</b> FILE</a></dt>
+  <dd>The file to read and change. Default: $XYMONHOME/etc/xymonserver.cfg, the
+      file xymon.sh starts Xymon with.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="a"><a class="permalink" href="#a"><b>-a</b></a></dt>
+  <dd>With <b>set</b>: add a NAME the file does not have yet, as a new line at
+      the end of the file.
+    <p class="Pp"></p>
+  </dd>
+</dl>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="LIMITATIONS"><a class="permalink" href="#LIMITATIONS">LIMITATIONS</a></h1>
+<p class="Pp">Only the lines of the file itself are read and changed: a setting
+    from a file it includes, and the &quot;AREA/NAME=&quot; and
+    &quot;NAME+=&quot; forms, are left alone. A value cannot hold a newline.</p>
+<p class="Pp"></p>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="EXAMPLES"><a class="permalink" href="#EXAMPLES">EXAMPLES</a></h1>
+<pre>xymonsettings.sh get XYMONSKIN
+xymonsettings.sh set STATUSLIFETIME=60
+xymonsettings.sh set XYMONPAGEACKFONT='COLOR=&quot;#33ebf4&quot; SIZE=&quot;-1&quot;'</pre>
+<p class="Pp"></p>
+</section>
+<section class="Sh">
+<p>&#160;</p>
+<h1 class="Sh" id="SEE_ALSO"><a class="permalink" href="#SEE_ALSO">SEE
+  ALSO</a></h1>
+<p class="Pp"><a href="../man5/xymonserver.cfg.5.html">xymonserver.cfg</a>(5), <a href="../man1/xymoncmd.1.html">xymoncmd</a>(1), <a href="../man7/xymon.7.html">xymon</a>(7)</p>
+</section>
+<p>&#160;</p>
+<h1 class="Sh" id="INDEX"><a class="permalink" href="#INDEX">Index</a></h1>
+<dl class="Bl-tag">
+<dt><a href="#NAME">NAME</a></dt>
+<dt><a href="#SYNOPSIS">SYNOPSIS</a></dt>
+<dt><a href="#DESCRIPTION">DESCRIPTION</a></dt>
+<dt><a href="#COMMANDS">COMMANDS</a></dt>
+<dt><a href="#OPTIONS">OPTIONS</a></dt>
+<dt><a href="#LIMITATIONS">LIMITATIONS</a></dt>
+<dt><a href="#EXAMPLES">EXAMPLES</a></dt>
+<dt><a href="#SEE_ALSO">SEE ALSO</a></dt>
+</dl>
+</div>
+<hr/>
+This document was created by mandoc, using the manual pages.
+
+</body>
+</html>
