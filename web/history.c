@@ -86,18 +86,18 @@ static void generate_pct_summary(
 
 	fprintf(htmlrep, "<TR BGCOLOR=\"#000000\">\n");
 
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_GREEN, 0, 1), colorname(COL_GREEN), colorname(COL_GREEN), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_YELLOW, 0, 1), colorname(COL_YELLOW), colorname(COL_YELLOW), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_RED, 0, 1), colorname(COL_RED), colorname(COL_RED), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_PURPLE, 0, 1), colorname(COL_PURPLE), colorname(COL_PURPLE), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_CLEAR, 0, 1), colorname(COL_CLEAR), colorname(COL_CLEAR), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
-	fprintf(htmlrep, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0></TD>\n", 
-		xgetenv("XYMONSKIN"), dotgiffilename(COL_BLUE, 0, 1), colorname(COL_BLUE), colorname(COL_BLUE), xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_GREEN, 0, 1, colorname(COL_GREEN), colorname(COL_GREEN)));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_YELLOW, 0, 1, colorname(COL_YELLOW), colorname(COL_YELLOW)));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_RED, 0, 1, colorname(COL_RED), colorname(COL_RED)));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_PURPLE, 0, 1, colorname(COL_PURPLE), colorname(COL_PURPLE)));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_CLEAR, 0, 1, colorname(COL_CLEAR), colorname(COL_CLEAR)));
+	fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n",
+		statusicon(NULL, COL_BLUE, 0, 1, colorname(COL_BLUE), colorname(COL_BLUE)));
 	fprintf(htmlrep, "</TR>\n");
 	fprintf(htmlrep, "<TR BGCOLOR=\"#000033\">\n");
 	fprintf(htmlrep, "<TD ALIGN=CENTER><B>%.2f%%</B></TD>\n", repinfo->fullpct[COL_GREEN]);
@@ -473,9 +473,8 @@ static void generate_histlog_table(FILE *htmlrep,
 		fprintf(htmlrep, "<TD ALIGN=LEFT NOWRAP>%s</TD>\n", start);
 		fprintf(htmlrep, "<TD ALIGN=CENTER BGCOLOR=\"#000000\">");
 		fprintf(htmlrep, "<A HREF=\"%s\">", histlogurl(hostname, service, 0, walk->timespec));
-		fprintf(htmlrep, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=%s WIDTH=%s BORDER=0>", 
-			xgetenv("XYMONSKIN"), dotgiffilename(walk->color, 0, 1), colorname(walk->color), colorname(walk->color),
-			xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+		fprintf(htmlrep, "%s",
+			statusicon(NULL, walk->color, 0, 1, colorname(walk->color), colorname(walk->color)));
 		fprintf(htmlrep, "</A></TD>\n");
 
 		fprintf(htmlrep, "<TD ALIGN=CENTER>%s</TD>\n", durationstr(walk->duration));

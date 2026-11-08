@@ -120,6 +120,55 @@ char *dotgiffilename(int color, int acked, int oldage)
 	return filename;
 }
 
+/*
+ * Every icon on a Xymon page is written by statusicon() or columnicon(),
+ * so the pages carry one form of it. The CLASS names it "xmdot", then
+ * what it shows: "xmdot-<colour>" plus "xmdot-recent" or "xmdot-ack" for
+ * a status, as dotgiffilename() picks the image, or "xmdot-<column>" for
+ * the fixed image of the info, trends and client columns. A stylesheet
+ * can then address every icon, or one kind, without knowing the image
+ * file names. The names carry the prefix because the bare colour names
+ * are taken: xymonbody.css gives .green, .red and so on the page
+ * background image, which would show through every icon.
+ *
+ * alttext and titletext go into the tag as given: callers pass text that
+ * is already safe in an attribute. A NULL titletext leaves TITLE out.
+ * The result is in a static buffer, overwritten by the next call.
+ */
+static char *iconhtml(char *skin, char *imgfile, char *classes, char *alttext, char *titletext)
+{
+	static strbuffer_t *result = NULL;
+
+	if (result == NULL) result = newstrbuffer(0); else clearstrbuffer(result);
+
+	addtobuffer_many(result, "<IMG SRC=\"", (skin ? skin : xgetenv("XYMONSKIN")), "/", imgfile,
+			 "\" CLASS=\"", classes, "\" ALT=\"", alttext, "\"", NULL);
+	if (titletext) addtobuffer_many(result, " TITLE=\"", titletext, "\"", NULL);
+	addtobuffer_many(result, " HEIGHT=\"", xgetenv("DOTHEIGHT"),
+			 "\" WIDTH=\"", xgetenv("DOTWIDTH"), "\" BORDER=0>", NULL);
+
+	return STRBUF(result);
+}
+
+char *statusicon(char *skin, int color, int acked, int oldage, char *alttext, char *titletext)
+{
+	char classes[64];
+
+	snprintf(classes, sizeof(classes), "xmdot xmdot-%s%s", colorname(color),
+		 (acked ? " xmdot-ack" : ((use_recentgifs && !oldage) ? " xmdot-recent" : "")));
+
+	return iconhtml(skin, dotgiffilename(color, acked, oldage), classes, alttext, titletext);
+}
+
+char *columnicon(char *skin, char *imgfile, char *column, char *alttext, char *titletext)
+{
+	char classes[64];
+
+	snprintf(classes, sizeof(classes), "xmdot xmdot-%s", column);
+
+	return iconhtml(skin, imgfile, classes, alttext, titletext);
+}
+
 #ifndef CLIENTONLY
 int colorset(char *colspec, int excludeset)
 {

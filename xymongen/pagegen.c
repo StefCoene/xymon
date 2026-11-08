@@ -415,10 +415,8 @@ void do_vertical(host_t *head, FILE *output, char *pagepath)
 				skin = (e->skin ? e->skin : xymonskin);
 
 				fprintf(output, "<A HREF=\"%s\">", hostsvcurl(h->hostname, e->column->name, 1));
-				fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0></A>",
-						skin, dotgiffilename(e->color, e->acked, e->oldage),
-						htmlalttag, htmlalttag,
-						xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+				fprintf(output, "%s</A>",
+						statusicon(skin, e->color, e->acked, e->oldage, htmlalttag, htmlalttag));
 			}
 			fprintf(output, "</td>");
 		}
@@ -556,34 +554,36 @@ void do_hosts(host_t *head, int sorthosts, char *onlycols, char *exceptcols, FIL
 					fprintf(output, "<A HREF=\"%s\">", 
 						histlogurl(h->hostname, e->column->name, 0, e->histlogname));
 
-					fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0></A>",
-						xymonskin, dotgiffilename(e->color, 0, 1),
-						htmlalttag, htmlalttag,
-						xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+					fprintf(output, "%s</A>",
+						statusicon(xymonskin, e->color, 0, 1, htmlalttag, htmlalttag));
 				}
 				else if (reportstart == 0) {
 					/* Standard webpage */
-					char *skin;
-					char *img = dotgiffilename(e->color, e->acked, e->oldage);
+					char *skin = (e->skin ? e->skin : xymonskin);
+					char *icon;
 
+					/*
+					 * icon is in the static buffer of statusicon() and
+					 * columnicon(); nothing called between here and the
+					 * fprintf() below writes an icon.
+					 */
 					if (strcmp(e->column->name, xgetenv("INFOCOLUMN")) == 0) {
 						/* Show the host IP on the hint display of the "info" column */
 						htmlalttag = alttag(e->column->name, COL_GREEN, 0, 1, h->ip);
-						img = infocolumngif;
+						icon = columnicon(skin, infocolumngif, "info", htmlalttag, htmlalttag);
 					}
 					else if (strcmp(e->column->name, xgetenv("TRENDSCOLUMN")) == 0) {
 						htmlalttag = alttag(e->column->name, COL_GREEN, 0, 1, h->ip);
-						img = trendscolumngif;
+						icon = columnicon(skin, trendscolumngif, "trends", htmlalttag, htmlalttag);
 					}
 					else if (strcmp(e->column->name, xgetenv("CLIENTCOLUMN")) == 0) {
 						htmlalttag = alttag(e->column->name, COL_GREEN, 0, 1, h->ip);
-						img = clientcolumngif;
+						icon = columnicon(skin, clientcolumngif, "client", htmlalttag, htmlalttag);
 					}
 					else {
 						htmlalttag = alttag(e->column->name, e->color, e->acked, e->propagate, e->age);
+						icon = statusicon(skin, e->color, e->acked, e->oldage, htmlalttag, htmlalttag);
 					}
-
-					skin = (e->skin ? e->skin : xymonskin);
 
 					if (e->sumurl) {
 						/* A summary host. */
@@ -606,18 +606,13 @@ void do_hosts(host_t *head, int sorthosts, char *onlycols, char *exceptcols, FIL
 						do_rss_item(rssoutput, h, e);
 					}
 
-					fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0></A>",
-						skin, img,
-						htmlalttag, htmlalttag,
-						xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+					fprintf(output, "%s</A>", icon);
 				}
 				else {
 					/* Report format output */
 					if ((e->color == COL_GREEN) || (e->color == COL_CLEAR)) {
-						fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0>",
-							xymonskin, dotgiffilename(e->color, 0, 1),
-							colorname(e->color), colorname(e->color),
-							xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+						fprintf(output, "%s",
+							statusicon(xymonskin, e->color, 0, 1, colorname(e->color), colorname(e->color)));
 					}
 					else {
 						if (dynamicreport) {
@@ -869,10 +864,9 @@ void do_page_subpages(FILE *output, xymongen_page_t *subs, char *pagepath)
 			fprintf(output, "</FONT></TD>\n");
 
 			fprintf(output, "<TD><CENTER><A HREF=\"%s\">", cleanurl(pagelink));
-			fprintf(output, "<IMG SRC=\"%s/%s\" WIDTH=\"%s\" HEIGHT=\"%s\" BORDER=0 ALT=\"%s\" TITLE=\"%s\"></A>", 
-				xgetenv("XYMONSKIN"), dotgiffilename(p->color, 0, ((reportstart > 0) ? 1 : p->oldage)), 
-				xgetenv("DOTWIDTH"), xgetenv("DOTHEIGHT"),
-				colorname(p->color), colorname(p->color));
+			fprintf(output, "%s</A>",
+				statusicon(NULL, p->color, 0, ((reportstart > 0) ? 1 : p->oldage),
+					   colorname(p->color), colorname(p->color)));
 			fprintf(output, "</CENTER></TD>\n");
 
 			if (currentcolumn == (subpagecolumns-1)) {

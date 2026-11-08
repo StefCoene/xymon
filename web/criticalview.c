@@ -265,6 +265,7 @@ void print_hoststatus(FILE *output, hstatus_t *itm, void * statetree, void * col
 				time_t age = now - column->lastchange;
 				char *htmlgroupstr;
 				char *htmlextrastr;
+				SBUF_DEFINE(htmltitle);
 
 				htmlalttag = alttag(colname, column->color, 0, 1, agestring(age));
 				htmlackstr = (column->ackmsg ? column->ackmsg : "");
@@ -274,11 +275,12 @@ void print_hoststatus(FILE *output, hstatus_t *itm, void * statetree, void * col
 					hostsvcurl(itm->hostname, colname, 1),
 					prio, 
 					htmlgroupstr, htmlextrastr);
-				fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" TITLE=\"%s %s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0></A>",
-					xgetenv("XYMONSKIN"), 
-					dotgiffilename(column->color, (column->acktime > 0), (age > oldlimit)),
-					colorname(column->color), htmlalttag, htmlackstr,
-					xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+				SBUF_MALLOC(htmltitle, strlen(htmlalttag) + strlen(htmlackstr) + 2);
+				snprintf(htmltitle, htmltitle_buflen, "%s %s", htmlalttag, htmlackstr);
+				fprintf(output, "%s</A>",
+					statusicon(NULL, column->color, (column->acktime > 0), (age > oldlimit),
+						   colorname(column->color), htmltitle));
+				xfree(htmltitle);
 				xfree(htmlgroupstr);
 				xfree(htmlextrastr);
 			}

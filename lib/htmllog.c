@@ -150,10 +150,7 @@ static void textwithcolorimg(char *msg, FILE *output)
 				acked = (strncmp(p + 1 + strlen(colorname(color)), "-acked", 6) == 0);
 				recent = (strncmp(p + 1 + strlen(colorname(color)), "-recent", 7) == 0);
 
-				fprintf(output, "<IMG SRC=\"%s/%s\" ALT=\"%s\" HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0>",
-                                                        xgetenv("XYMONSKIN"), dotgiffilename(color, acked, !recent),
-							colorname(color),
-                                                        xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"));
+				fprintf(output, "%s", statusicon(NULL, color, acked, !recent, colorname(color), NULL));
 
 				restofmsg = p+1+strlen(colorname(color));
 				if (acked) restofmsg += 6;

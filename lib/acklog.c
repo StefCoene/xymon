@@ -215,9 +215,9 @@ void do_acklog(FILE *output, int maxcount, int maxminutes)
 			fprintf(output, "<TD ALIGN=CENTER><FONT COLOR=white>%s</FONT></TD>\n", acks[num].testname);
 
 			if (acks[num].color != -1) {
-   				fprintf(output, "<TD ALIGN=CENTER><IMG SRC=\"%s/%s\"></TD>\n", 
-					xgetenv("XYMONSKIN"), 
-					dotgiffilename(acks[num].color, acks[num].ackvalid, 1));
+				fprintf(output, "<TD ALIGN=CENTER>%s</TD>\n",
+					statusicon(NULL, acks[num].color, acks[num].ackvalid, 1,
+						   colorname(acks[num].color), NULL));
 			}
 			else
    				fprintf(output, "<TD ALIGN=CENTER><FONT COLOR=white>&nbsp;</FONT></TD>\n");

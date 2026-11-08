@@ -832,18 +832,14 @@ void do_eventlog(FILE *output, int maxcount, int maxminutes, char *fromtime, cha
 			fprintf(output, "<TD ALIGN=LEFT>%s</TD>\n", ewalk->service->name);
 			fprintf(output, "<TD><A HREF=\"%s\">\n", 
 				histlogurl(hostname, ewalk->service->name, ewalk->changetime, NULL));
-			fprintf(output, "<IMG SRC=\"%s/%s\"  HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0 ALT=\"%s\" TITLE=\"%s\"></A>\n", 
-				xgetenv("XYMONSKIN"), dotgiffilename(ewalk->oldcolor, 0, 0), 
-				xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"), 
-				colorname(ewalk->oldcolor), colorname(ewalk->oldcolor));
+			fprintf(output, "%s</A>\n",
+				statusicon(NULL, ewalk->oldcolor, 0, 0, colorname(ewalk->oldcolor), colorname(ewalk->oldcolor)));
 			fprintf(output, "<IMG SRC=\"%s/arrow.%s\" BORDER=0 ALT=\"From -&gt; To\">\n", 
 				xgetenv("XYMONSKIN"), xgetenv("IMAGEFILETYPE"));
 			fprintf(output, "<TD><A HREF=\"%s\">\n", 
 				histlogurl(hostname, ewalk->service->name, ewalk->eventtime, NULL));
-			fprintf(output, "<IMG SRC=\"%s/%s\"  HEIGHT=\"%s\" WIDTH=\"%s\" BORDER=0 ALT=\"%s\" TITLE=\"%s\"></A></TD>\n", 
-				xgetenv("XYMONSKIN"), dotgiffilename(ewalk->newcolor, 0, 0), 
-				xgetenv("DOTHEIGHT"), xgetenv("DOTWIDTH"), 
-				colorname(ewalk->newcolor), colorname(ewalk->newcolor));
+			fprintf(output, "%s</A></TD>\n",
+				statusicon(NULL, ewalk->newcolor, 0, 0, colorname(ewalk->newcolor), colorname(ewalk->newcolor)));
 			fprintf(output, "</TR>\n");
 		}
 
