@@ -40,6 +40,7 @@ done
 
 # Fixed values, so the expected tags do not depend on the defaults.
 export XYMONSKIN=/xymon/gifs DOTHEIGHT=16 DOTWIDTH=16 IMAGEFILETYPE=gif
+unset ICONSTYLE
 
 tail='HEIGHT="16" WIDTH="16" BORDER=0>'
 

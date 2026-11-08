@@ -1063,6 +1063,23 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
       webpage. Default: FALSE.
     <p class="Pp"></p>
   </dd>
+  <dt id="ICONSTYLE"><a class="permalink" href="#ICONSTYLE"><b>ICONSTYLE</b></a></dt>
+  <dd>How the icons showing the color of a status are drawn on the web pages.
+      &quot;image&quot; (the default) uses the icon files in XYMONSKIN.
+      &quot;text&quot; shows a colored character instead: a check mark for
+      green, a triangle for yellow, an x for red, a diamond for purple, a circle
+      for clear and a slashed circle for blue. A status that changed recently
+      gets a &quot;*&quot; after the character, and an acknowledged one a
+      &quot;~&quot;. The info, trends and client columns show an i, an arrow and
+      three bars, not the green check mark: they are links, not a status, and in
+      text the character is what the reader takes in. With &quot;text&quot;,
+      INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF, which choose the image
+      of those columns, have no effect. The characters stay in the text when it
+      is copied from the page; the colors come from xymonbody.css in XYMONSKIN.
+      Pages that xymongen writes change at its next run. Any other value is the
+      same as &quot;image&quot;.
+    <p class="Pp"></p>
+  </dd>
   <dt id="DOTHEIGHT"><a class="permalink" href="#DOTHEIGHT"><b>DOTHEIGHT</b></a></dt>
   <dd>The height (in pixels) of the icons showing the color of a status.
       Default: 16, which matches the default icons.

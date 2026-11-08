@@ -129,6 +129,7 @@ const static struct {
 	{ "DOTHEIGHT", "16" },
 	{ "DOTWIDTH", "16" },
 	{ "IMAGEFILETYPE", "gif" },
+	{ "ICONSTYLE", "image" },
 	{ "RRDHEIGHT", "120" },
 	{ "RRDWIDTH", "576" },
 	{ "COLUMNDOCURL", "$CGIBINURL/columndoc.sh?%s" },

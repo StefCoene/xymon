@@ -32,3 +32,25 @@ a:visited { color: #FFFF44; text-decoration: underline; }
 	background-image: url(bkg-clear.gif);
 }
 
+
+/*
+ * Status icons as text (ICONSTYLE="text" in xymonserver.cfg): a character
+ * in a span.xmdot, with xmdot-<colour>, xmdot-recent or xmdot-ack, or
+ * xmdot-info, xmdot-trends or xmdot-client for those columns. The width
+ * comes from DOTWIDTH, written on each icon. As images the same classes
+ * are on the <img>; these rules only style the spans.
+ */
+span.xmdot {
+	display: inline-block;
+	text-align: center;
+	font-weight: bold;
+	line-height: 1;
+}
+span.xmdot-green  { color: #00CC00; }
+span.xmdot-yellow { color: #FFCC00; }
+span.xmdot-red    { color: #FF0000; }
+span.xmdot-purple { color: #CC66FF; }
+span.xmdot-clear  { color: #C0C0C0; }
+span.xmdot-blue   { color: #3399FF; }
+span.xmdot-ack    { opacity: 0.6; }
+span.xmdot-mark   { font-size: 0.6em; vertical-align: super; }

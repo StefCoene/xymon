@@ -131,15 +131,33 @@ char *dotgiffilename(int color, int acked, int oldage)
  * are taken: xymonbody.css gives .green, .red and so on the page
  * background image, which would show through every icon.
  *
+ * With ICONSTYLE=text the icon is a character in a SPAN instead of an
+ * image, coloured by the classes in xymonbody.css. The character is
+ * written as a numeric character reference, not as UTF-8: the header
+ * templates declare no charset, so raw UTF-8 bytes could arrive garbled.
+ * A recent change adds a "*", an acknowledgement a "~", so the state
+ * survives when the text is copied out of the page.
+ *
  * alttext and titletext go into the tag as given: callers pass text that
  * is already safe in an attribute. A NULL titletext leaves TITLE out.
  * The result is in a static buffer, overwritten by the next call.
  */
-static char *iconhtml(char *skin, char *imgfile, char *classes, char *alttext, char *titletext)
+static char *iconhtml(char *skin, char *imgfile, char *classes, char *textchar, char *textmark,
+		      char *alttext, char *titletext)
 {
 	static strbuffer_t *result = NULL;
 
 	if (result == NULL) result = newstrbuffer(0); else clearstrbuffer(result);
+
+	if (strcmp(xgetenv("ICONSTYLE"), "text") == 0) {
+		addtobuffer_many(result, "<SPAN CLASS=\"", classes, "\" ROLE=\"img\" ARIA-LABEL=\"", alttext, "\"", NULL);
+		if (titletext) addtobuffer_many(result, " TITLE=\"", titletext, "\"", NULL);
+		addtobuffer_many(result, " STYLE=\"min-width: ", xgetenv("DOTWIDTH"), "px\">", textchar, NULL);
+		if (textmark) addtobuffer_many(result, "<SPAN CLASS=\"xmdot-mark\">", textmark, "</SPAN>", NULL);
+		addtobuffer(result, "</SPAN>");
+
+		return STRBUF(result);
+	}
 
 	addtobuffer_many(result, "<IMG SRC=\"", (skin ? skin : xgetenv("XYMONSKIN")), "/", imgfile,
 			 "\" CLASS=\"", classes, "\" ALT=\"", alttext, "\"", NULL);
@@ -153,20 +171,42 @@ static char *iconhtml(char *skin, char *imgfile, char *classes, char *alttext, c
 char *statusicon(char *skin, int color, int acked, int oldage, char *alttext, char *titletext)
 {
 	char classes[64];
+	char *textchar, *textmark = NULL;
+
+	switch (color) {
+	  case COL_GREEN:  textchar = "&#x2713;"; break;	/* check mark */
+	  case COL_YELLOW: textchar = "&#x25B2;"; break;	/* black up-pointing triangle */
+	  case COL_RED:    textchar = "&#x2715;"; break;	/* multiplication x */
+	  case COL_PURPLE: textchar = "&#x25C6;"; break;	/* black diamond */
+	  case COL_CLEAR:  textchar = "&#x25CB;"; break;	/* white circle */
+	  case COL_BLUE:   textchar = "&#x2298;"; break;	/* circled division slash */
+	  default:         textchar = "?"; break;
+	}
+
+	if (acked) textmark = "~";
+	else if (use_recentgifs && !oldage) textmark = "*";
 
 	snprintf(classes, sizeof(classes), "xmdot xmdot-%s%s", colorname(color),
 		 (acked ? " xmdot-ack" : ((use_recentgifs && !oldage) ? " xmdot-recent" : "")));
 
-	return iconhtml(skin, dotgiffilename(color, acked, oldage), classes, alttext, titletext);
+	return iconhtml(skin, dotgiffilename(color, acked, oldage), classes, textchar, textmark,
+			alttext, titletext);
 }
 
 char *columnicon(char *skin, char *imgfile, char *column, char *alttext, char *titletext)
 {
 	char classes[64];
+	char *textchar;
+
+	/* Not a status, so not a status character: a green check here would read as one. */
+	if (strcmp(column, "info") == 0) textchar = "&#x24D8;";		/* circled latin small i */
+	else if (strcmp(column, "trends") == 0) textchar = "&#x2197;";	/* north east arrow */
+	else if (strcmp(column, "client") == 0) textchar = "&#x2630;";	/* trigram for heaven */
+	else textchar = "&#x2022;";					/* bullet */
 
 	snprintf(classes, sizeof(classes), "xmdot xmdot-%s", column);
 
-	return iconhtml(skin, imgfile, classes, alttext, titletext);
+	return iconhtml(skin, imgfile, classes, textchar, NULL, alttext, titletext);
 }
 
 #ifndef CLIENTONLY
