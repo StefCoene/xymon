@@ -1073,6 +1073,17 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
       16, which matches the default icons.
     <p class="Pp"></p>
   </dd>
+  <dt id="IMAGEFILETYPE"><a class="permalink" href="#IMAGEFILETYPE"><b>IMAGEFILETYPE</b></a></dt>
+  <dd>The filename extension, without the dot, of the icons loaded from the
+      XYMONSKIN directory: the status icons (e.g. &quot;red.gif&quot;,
+      &quot;yellow-recent.gif&quot;, &quot;green-ack.gif&quot;), the arrow in
+      the event log, and the zoom icon on graphs. Set it to &quot;png&quot; or
+      &quot;svg&quot; to use an icon set in that format; every one of these
+      files must then exist in XYMONSKIN with the new extension. The page
+      backgrounds named in xymonbody.css and the favicon files are not affected.
+      Default: gif.
+    <p class="Pp"></p>
+  </dd>
   <dt id="CLIENTSVCS"><a class="permalink" href="#CLIENTSVCS"><b>CLIENTSVCS</b></a></dt>
   <dd>List of the status logs fed by data from the Xymon client. These status
       logs will - if there are Xymon client data available for the host -

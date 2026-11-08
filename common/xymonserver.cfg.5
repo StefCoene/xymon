@@ -931,6 +931,16 @@ Default: 16, which matches the default icons.
 The width (in pixels) of the icons showing the color of a status.
 Default: 16, which matches the default icons.
 
+.IP "\fBIMAGEFILETYPE\fR"
+The filename extension, without the dot, of the icons loaded from
+the XYMONSKIN directory: the status icons (e.g. "red.gif",
+"yellow\-recent.gif", "green\-ack.gif"), the arrow in the event log,
+and the zoom icon on graphs. Set it to "png" or "svg" to use an icon
+set in that format; every one of these files must then exist in
+XYMONSKIN with the new extension. The page backgrounds named in
+xymonbody.css and the favicon files are not affected.
+Default: gif.
+
 .IP "\fBCLIENTSVCS\fR"
 List of the status logs fed by data from the Xymon client. These
 status logs will - if there are Xymon client data available for
