@@ -16,6 +16,11 @@
 # every skin too, with a CSS animation, and every animation stops when the
 # browser asks for reduced motion.
 #
+# Every set -- gifs and each skin -- has a "static" directory beside its
+# icons for pages that should not move: complete in the same way, and with
+# nothing in it that moves, neither a GIF with a loop block nor an SVG with
+# an animation.
+#
 # The info, trends and client columns are not tests, so the shipped
 # xymonserver.cfg gives each its own icon instead of the green status one;
 # each of INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF must name such
@@ -65,37 +70,51 @@ for var in INFOCOLUMNGIF TRENDSCOLUMNGIF CLIENTCOLUMNGIF; do
 	[ -f "$gifs/$val" ] || fail "$var=\"$val\" in the installed xymonserver.cfg, but the install put no $val in gifs"
 done
 
-skins=$(cd "$ROOT/xymond/wwwfiles/skins" && for d in */; do printf '%s\n' "${d%/}"; done)
-[ -n "$skins" ] || fail "no skin directories under xymond/wwwfiles/skins"
-
+# check_set DIR LABEL EXT STILL -- every icon gifs has, as DIR/NAME.EXT,
+# and every background, favicon and the stylesheet with the content gifs
+# has. With STILL=1 nothing in DIR may move.
 checked=0
-for s in $skins; do
-	dir=$dest/var/www/skins/$s
-	[ -d "$dir" ] || fail "skin '$s' was not installed at $dir"
-
+check_set() {
+	local dir=$1 label=$2 ext=$3 still=$4 f name icon
+	[ -d "$dir" ] || fail "$label was not installed at $dir"
 	for f in "$gifs"/*; do
 		name=${f##*/}
 		case "$name" in
-		README) ;;
+		README|static) ;;
 		bkg-*|favicon-*|xymonbody.css)
-			[ -e "$dir/$name" ] || fail "skin '$s' has no working $name: the page would ask $dir/$name"
-			cmp -s "$f" "$dir/$name" || fail "skin '$s' $name differs from the one in gifs"
+			[ -e "$dir/$name" ] || fail "$label has no working $name: the page would ask $dir/$name"
+			cmp -s "$f" "$dir/$name" || fail "$label $name differs from the one in gifs"
 			;;
 		*.gif)
-			svg=$dir/${name%.gif}.svg
-			[ -f "$svg" ] || fail "skin '$s' has no ${name%.gif}.svg, the icon gifs has as $name"
-			grep -q '<svg' "$svg" || fail "skin '$s' ${svg##*/} is not an SVG image"
-			if grep -qi '<script' "$svg"; then fail "skin '$s' ${svg##*/} carries a script"; fi
-			if grep -q NETSCAPE2.0 "$f" && ! grep -q '@keyframes' "$svg"; then
-				fail "skin '$s' ${svg##*/} stands still, while $name in gifs moves"
-			fi
-			if grep -q '@keyframes' "$svg" && ! grep -q 'prefers-reduced-motion' "$svg"; then
-				fail "skin '$s' ${svg##*/} moves, but does not stop for prefers-reduced-motion"
+			icon=$dir/${name%.gif}.$ext
+			[ -f "$icon" ] || fail "$label has no ${icon##*/}, the icon gifs has as $name"
+			if [ "$ext" = svg ]; then
+				grep -q '<svg' "$icon" || fail "$label ${icon##*/} is not an SVG image"
+				if grep -qi '<script' "$icon"; then fail "$label ${icon##*/} carries a script"; fi
+				if [ "$still" = 0 ] && grep -q NETSCAPE2.0 "$f" && ! grep -q '@keyframes' "$icon"; then
+					fail "$label ${icon##*/} stands still, while $name in gifs moves"
+				fi
+				if grep -q '@keyframes' "$icon"; then
+					[ "$still" = 0 ] || fail "$label ${icon##*/} moves, in a set that should stand still"
+					grep -q 'prefers-reduced-motion' "$icon" \
+						|| fail "$label ${icon##*/} moves, but does not stop for prefers-reduced-motion"
+				fi
+			elif [ "$still" = 1 ] && grep -q NETSCAPE2.0 "$icon"; then
+				fail "$label ${icon##*/} is an animated GIF, in a set that should stand still"
 			fi
 			checked=$((checked + 1))
 			;;
 		esac
 	done
+}
+
+check_set "$gifs/static" "gifs/static" gif 1
+
+skins=$(cd "$ROOT/xymond/wwwfiles/skins" && for d in */; do printf '%s\n' "${d%/}"; done)
+[ -n "$skins" ] || fail "no skin directories under xymond/wwwfiles/skins"
+for s in $skins; do
+	check_set "$dest/var/www/skins/$s" "skin '$s'" svg 0
+	check_set "$dest/var/www/skins/$s/static" "skin '$s/static'" svg 1
 done
 
-pass "the info, trends and client columns have their own installed icon, and every installed skin has all $checked icons in SVG, moving where gifs moves, and reaches the backgrounds, favicons and stylesheet of gifs"
+pass "the info, trends and client columns have their own installed icon; every skin has every icon of gifs in SVG, moving where gifs moves, and every set has a complete static variant that does not move ($checked icons checked)"
