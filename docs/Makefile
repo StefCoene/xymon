@@ -30,7 +30,7 @@ clean:
 install:
 	mkdir -p $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/manpages
 	cd manpages; tar cf - . | (cd $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/manpages; tar xf -)
-	cp -f *html *txt *png *jpg $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/; rm -f $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/man-index.html
+	cp -f *html *txt *png *jpg help-theme.css help-theme.js $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/; rm -f $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/man-index.html
 	cp -f man-index.html $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help/manpages/index.html
 ifndef PKGBUILD
 	chown -R $(XYMONUSER) $(INSTALLROOT)$(INSTALLSTATICWWWDIR)/help

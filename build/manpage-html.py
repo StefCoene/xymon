@@ -20,6 +20,10 @@ Reads one page on standard input, writes it to standard output.
   4. section spacing    man2html precedes each heading with a non-breaking
                         space, which is a real line box; reproduce it so the
                         vertical rhythm is unchanged.
+  5. help theme         a link to help-theme.css and help-theme.js, which every
+                        help page shares (docs/help-theme.css), after mandoc's
+                        stylesheet: the black or white background and the
+                        button that switches between them.
 """
 import re
 import sys
@@ -186,6 +190,21 @@ def rename_anchors(html):
     return html
 
 
+# mandoc's own stylesheet link, from "-O style=../mandoc.css". The pages are
+# installed in help/manpages/manN/, the help theme in help/.
+STYLE = re.compile(r'(<link rel="stylesheet" href="\.\./mandoc\.css"[^>]*>\n)')
+
+
+def add_theme(html):
+    theme = ('  <link rel="stylesheet" href="../../help-theme.css" type="text/css"'
+             ' media="all"/>\n'
+             '  <script src="../../help-theme.js"></script>\n')
+    html, n = STYLE.subn(lambda m: m.group(1) + theme, html, count=1)
+    if n != 1:
+        sys.exit("manpage-html.py: no mandoc stylesheet link to put the help theme after")
+    return html
+
+
 def main():
     # makehtml.sh exports LC_ALL=C, and under a C locale Python decodes stdin
     # as ASCII up to 3.6; 3.7 promotes it to UTF-8 (PEP 538/540). The pages are
@@ -211,6 +230,7 @@ def main():
     html = match_spacing(html)
     html = rewrite_banner(html)
     html = rewrite_footer(html)
+    html = add_theme(html)
     sys.stdout.write(html)
 
 

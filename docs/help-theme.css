@@ -1,0 +1,65 @@
+/* Black or white background for the Xymon help pages.
+ *
+ * Every page under help/ -- the guides in docs/ and the manual pages that
+ * build/makehtml.sh generates -- links this file and help-theme.js. Black is
+ * the default, with the colours of the Xymon web pages (xymonbody.css), so
+ * the help looks like the rest of Xymon, also with JavaScript off. The
+ * button help-theme.js puts at the top of the page switches to white, the
+ * browser's own colours that manual pages traditionally have, and back; the
+ * choice is kept for every help page.
+ */
+
+html {
+	color-scheme: dark;
+	background: black;
+	color: #D8D8BF;
+}
+html body {
+	background: black;
+	color: #D8D8BF;
+}
+html a:link { color: #00FFAA; }
+html a:visited { color: #FFFF44; }
+html pre, html code, html tt { color: inherit; }
+html hr { border-color: #555; }
+html table, html th, html td { border-color: #555; }
+
+/* White: give the page back to the browser's defaults. */
+html[data-theme="light"] {
+	color-scheme: light;
+	background: white;
+	color: black;
+}
+html[data-theme="light"] body {
+	background: white;
+	color: black;
+}
+html[data-theme="light"] a:link { color: #0000EE; }
+html[data-theme="light"] a:visited { color: #551A8B; }
+html[data-theme="light"] hr,
+html[data-theme="light"] table,
+html[data-theme="light"] th,
+html[data-theme="light"] td { border-color: #CCC; }
+
+/* The switch, top right, out of the text's way. */
+#help-theme-toggle {
+	position: fixed;
+	top: 8px;
+	right: 8px;
+	z-index: 10;
+	padding: 3px 10px;
+	font: 13px Arial, Helvetica, sans-serif;
+	cursor: pointer;
+	border: 1px solid #555;
+	border-radius: 4px;
+	background: #222;
+	color: #D8D8BF;
+}
+html[data-theme="light"] #help-theme-toggle {
+	border-color: #999;
+	background: #F4F4F4;
+	color: black;
+}
+@media print {
+	#help-theme-toggle { display: none; }
+}
