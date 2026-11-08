@@ -428,7 +428,15 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
   </dd>
   <dt id="XYMONSKIN"><a class="permalink" href="#XYMONSKIN"><b>XYMONSKIN</b></a></dt>
   <dd>URL prefix (without hostname) of the Xymon graphics. E.g.
-      &quot;/xymon/gifs&quot;.
+      &quot;/xymon/gifs&quot;. Two other icon sets are installed beside the
+      default one, in SVG: &quot;$XYMONSERVERWWWURL/skins/accessible&quot;,
+      where every status has its own shape as well as its own color, and
+      &quot;$XYMONSERVERWWWURL/skins/vector&quot;. To use one, set XYMONSKIN to
+      it and IMAGEFILETYPE to &quot;svg&quot;. Set INFOCOLUMNGIF,
+      TRENDSCOLUMNGIF and CLIENTCOLUMNGIF, the image of the info, trends and
+      client columns, to &quot;green.svg&quot; as well: they name the file with
+      its extension, and the shipped xymonserver.cfg sets them to
+      &quot;green.gif&quot;.
     <p class="Pp"></p>
   </dd>
   <dt id="XYMONHELPSKIN"><a class="permalink" href="#XYMONHELPSKIN"><b>XYMONHELPSKIN</b></a></dt>

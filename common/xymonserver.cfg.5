@@ -346,6 +346,14 @@ URL prefix (without hostname) of the Xymon webpages. E.g. "/xymon".
 
 .IP "\fBXYMONSKIN\fR"
 URL prefix (without hostname) of the Xymon graphics. E.g. "/xymon/gifs".
+Two other icon sets are installed beside the default one, in SVG:
+"$XYMONSERVERWWWURL/skins/accessible", where every status has its own
+shape as well as its own color, and "$XYMONSERVERWWWURL/skins/vector".
+To use one, set XYMONSKIN to it and IMAGEFILETYPE to "svg". Set
+INFOCOLUMNGIF, TRENDSCOLUMNGIF and CLIENTCOLUMNGIF, the image of the
+info, trends and client columns, to "green.svg" as well: they name
+the file with its extension, and the shipped xymonserver.cfg sets
+them to "green.gif".
 
 .IP "\fBXYMONHELPSKIN\fR"
 URL prefix (without hostname) of the Xymon on-line help files. E.g "/xymon/help".
