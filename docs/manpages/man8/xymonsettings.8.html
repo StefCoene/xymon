@@ -28,7 +28,11 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
   <br/>
   <b>xymonsettings.sh [-c FILE] [-w DIR] skin NAME</b>
   <br/>
-  <b>xymonsettings.sh [-c FILE] [-w DIR] animation on|off</b></p>
+  <b>xymonsettings.sh [-c FILE] [-w DIR] animation on|off</b>
+  <br/>
+  <b>xymonsettings.sh [-c FILE] [-w DIR] layouts</b>
+  <br/>
+  <b>xymonsettings.sh [-c FILE] [-w DIR] layout NAME</b></p>
 <p class="Pp"></p>
 </section>
 <section class="Sh">
@@ -107,6 +111,20 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
       the set has no static variant.
     <p class="Pp"></p>
   </dd>
+  <dt id="layouts"><a class="permalink" href="#layouts"><b>layouts</b></a></dt>
+  <dd>List the page layouts installed in the &quot;layouts&quot; directory of
+      the web directory, and mark the one XYMONLAYOUT points at with
+      &quot;*&quot;; without an XYMONLAYOUT setting that is the built-in
+      default, &quot;classic&quot;.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="layout"><a class="permalink" href="#layout"><b>layout</b>
+    NAME</a></dt>
+  <dd>Make the web pages use page layout NAME: set XYMONLAYOUT to
+      &quot;$XYMONSERVERWWWURL/layouts/NAME&quot;, adding the setting when the
+      file does not have it. Refused when the layout has no layout.css.
+    <p class="Pp"></p>
+  </dd>
 </dl>
 </section>
 <section class="Sh">
@@ -124,9 +142,10 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
     <p class="Pp"></p>
   </dd>
   <dt id="w"><a class="permalink" href="#w"><b>-w</b> DIR</a></dt>
-  <dd>With <b>skins</b>, <b>skin</b> and <b>animation</b>: the web directory
-      that holds &quot;gifs&quot; and &quot;skins&quot;. Default: XYMONWWWDIR
-      from the settings file, as <a href="../man1/xymoncmd.1.html">xymoncmd</a>(1) expands it.
+  <dd>With <b>skins</b>, <b>skin</b>, <b>animation</b>, <b>layouts</b> and
+      <b>layout</b>: the web directory that holds &quot;gifs&quot;,
+      &quot;skins&quot; and &quot;layouts&quot;. Default: XYMONWWWDIR from the
+      settings file, as <a href="../man1/xymoncmd.1.html">xymoncmd</a>(1) expands it.
     <p class="Pp"></p>
   </dd>
 </dl>
@@ -147,7 +166,8 @@ xymonsettings.sh set STATUSLIFETIME=60
 xymonsettings.sh set XYMONPAGEACKFONT='COLOR=&quot;#33ebf4&quot; SIZE=&quot;-1&quot;'
 xymonsettings.sh skins
 xymonsettings.sh skin accessible
-xymonsettings.sh animation off</pre>
+xymonsettings.sh animation off
+xymonsettings.sh layout modern</pre>
 <p class="Pp"></p>
 </section>
 <section class="Sh">

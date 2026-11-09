@@ -22,6 +22,8 @@ Usage: $ME [-c FILE] get NAME...
        $ME [-c FILE] [-w DIR] skins
        $ME [-c FILE] [-w DIR] skin NAME
        $ME [-c FILE] [-w DIR] animation on|off
+       $ME [-c FILE] [-w DIR] layouts
+       $ME [-c FILE] [-w DIR] layout NAME
 
   -c FILE  the settings file (default: $XYMONHOME/etc/xymonserver.cfg)
   -a       with set: add a NAME the file does not have yet
@@ -336,6 +338,34 @@ skin)
 		}
 	fi
 	applyskin "$www" "$name" "$static"
+	;;
+
+layouts)
+	[ $# -eq 0 ] || usage
+	www=`wwwdir` || exit 1
+	# Without an XYMONLAYOUT line the built-in default applies: classic.
+	cur=`getval XYMONLAYOUT` || cur='$XYMONSERVERWWWURL/layouts/classic'
+	for name in `ls "$www/layouts" 2>/dev/null`; do
+		[ -f "$www/layouts/$name/layout.css" ] || continue
+		if [ "$cur" = "\$XYMONSERVERWWWURL/layouts/$name" ]; then
+			printf '* %s\n' "$name"
+		else
+			printf '  %s\n' "$name"
+		fi
+	done
+	;;
+
+layout)
+	[ $# -eq 1 ] || usage
+	name="$1"
+	case "$name" in
+	''|*/*|.*) die "'$name' is not a layout name" ;;
+	esac
+	www=`wwwdir` || exit 1
+	[ -f "$www/layouts/$name/layout.css" ] \
+		|| die "there is no layout '$name': $www/layouts/$name/layout.css does not exist; see '$ME layouts'"
+	ADD=1
+	doset "XYMONLAYOUT=\$XYMONSERVERWWWURL/layouts/$name"
 	;;
 
 animation)

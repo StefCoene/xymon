@@ -26,6 +26,9 @@
 # web directory comes from XYMONWWWDIR as xymoncmd expands it. "animation
 # off" points XYMONSKIN at the static variant of the set in use and "on"
 # back at the set, and "skin" keeps that choice when the new set can.
+# "layouts" lists the page layouts and marks the one XYMONLAYOUT points at
+# -- classic when the file has no such line, the built-in default -- and
+# "layout NAME" points XYMONLAYOUT at an installed one.
 #
 # Run on a copy of the shipped xymonserver.cfg.DIST and of the shipped gifs
 # and skins, through /bin/sh, as an administrator would run the installed
@@ -108,7 +111,7 @@ assert_equal added "$(loaded NEWSETTING)" "xymoncmd reads a setting added with -
 # "$XYMONHOME/www", so with XYMONHOME pointing here xymoncmd finds it.
 wwwsrc=$(dirname "$(dirname "$GREEN_GIF")")
 mkdir -p "$work/www" "$work/bin"
-cp -RP "$wwwsrc/gifs" "$wwwsrc/skins" "$work/www/"
+cp -RP "$wwwsrc/gifs" "$wwwsrc/skins" "$wwwsrc/layouts" "$work/www/"
 mkdir "$work/www/skins/plain" "$work/www/skins/empty"
 cp "$wwwsrc/gifs/green.gif" "$work/www/skins/plain/green.png"
 ln -s "$XYMONCMD" "$work/bin/xymoncmd"
@@ -178,7 +181,28 @@ for bad in nosuch empty ../etc; do
 done
 cmp -s "$work/before.cfg" "$cfg" || fail "a refused skin changed the file"
 
+# layouts and layout
+assert_equal "* classic
+  modern" "$(xs -c "$cfg" -w "$work/www" layouts)" "layouts with the shipped XYMONLAYOUT"
+xs -c "$cfg" -w "$work/www" layout modern >/dev/null
+assert_equal '$XYMONSERVERWWWURL/layouts/modern' "$(xs -c "$cfg" get XYMONLAYOUT)" "layout modern"
+assert_equal /xymon/layouts/modern "$(loaded XYMONLAYOUT)" "xymoncmd reads the XYMONLAYOUT layout wrote"
+assert_contains "* modern" "$(xs -c "$cfg" -w "$work/www" layouts)" "layouts marks the layout just chosen"
+grep -v '^XYMONLAYOUT=' "$cfg" > "$work/nolayout.cfg"
+assert_contains "* classic" "$(xs -c "$work/nolayout.cfg" -w "$work/www" layouts)" \
+	"layouts marks classic, the built-in default, when the file has no XYMONLAYOUT"
+xs -c "$work/nolayout.cfg" -w "$work/www" layout modern >/dev/null
+assert_equal '$XYMONSERVERWWWURL/layouts/modern' "$(xs -c "$work/nolayout.cfg" get XYMONLAYOUT)" \
+	"layout adds XYMONLAYOUT to a file that does not have it"
+cp "$cfg" "$work/before.cfg"
+for bad in nosuch ../etc ""; do
+	st=0; xs -c "$cfg" -w "$work/www" layout "$bad" >/dev/null 2>&1 || st=$?
+	assert_equal 1 "$st" "layout '$bad'"
+done
+cmp -s "$work/before.cfg" "$cfg" || fail "a refused layout changed the file"
+xs -c "$cfg" -w "$work/www" layout classic >/dev/null
+
 leftover=$(cd "$work/etc" && ls | grep -v '^xymonserver.cfg$' || true)
 [ -z "$leftover" ] || fail "set left files behind next to the config: $leftover"
 
-pass "xymonsettings reads values unexpanded, changes only the lines asked for or nothing at all, lists and picks skins, and switches their animation"
+pass "xymonsettings reads values unexpanded, changes only the lines asked for or nothing at all, lists and picks skins and layouts, and switches the animation"

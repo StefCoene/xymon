@@ -11,6 +11,10 @@ xymonsettings.sh \- show and change settings in xymonserver.cfg
 .B "xymonsettings.sh [\-c FILE] [\-w DIR] skin NAME"
 .br
 .B "xymonsettings.sh [\-c FILE] [\-w DIR] animation on|off"
+.br
+.B "xymonsettings.sh [\-c FILE] [\-w DIR] layouts"
+.br
+.B "xymonsettings.sh [\-c FILE] [\-w DIR] layout NAME"
 
 .SH DESCRIPTION
 xymonsettings.sh reads and changes the settings in
@@ -79,6 +83,16 @@ standing still, and \fBon\fR back at the set itself. Refused when
 XYMONSKIN points at none of the installed sets, or, for \fBoff\fR, when
 the set has no static variant.
 
+.IP "\fBlayouts\fR"
+List the page layouts installed in the "layouts" directory of the web
+directory, and mark the one XYMONLAYOUT points at with "*"; without an
+XYMONLAYOUT setting that is the built-in default, "classic".
+
+.IP "\fBlayout\fR NAME"
+Make the web pages use page layout NAME: set XYMONLAYOUT to
+"$XYMONSERVERWWWURL/layouts/NAME", adding the setting when the file
+does not have it. Refused when the layout has no layout.css.
+
 .SH OPTIONS
 .IP "\fB\-c\fR FILE"
 The file to read and change. Default: $XYMONHOME/etc/xymonserver.cfg,
@@ -89,8 +103,8 @@ With \fBset\fR: add a NAME the file does not have yet, as a new line
 at the end of the file.
 
 .IP "\fB\-w\fR DIR"
-With \fBskins\fR, \fBskin\fR and \fBanimation\fR: the web directory that holds "gifs"
-and "skins". Default: XYMONWWWDIR from the settings file, as
+With \fBskins\fR, \fBskin\fR, \fBanimation\fR, \fBlayouts\fR and \fBlayout\fR: the web directory that holds "gifs",
+"skins" and "layouts". Default: XYMONWWWDIR from the settings file, as
 xymoncmd(1) expands it.
 
 .SH LIMITATIONS
@@ -106,6 +120,7 @@ xymonsettings.sh set XYMONPAGEACKFONT='COLOR="#33ebf4" SIZE="\-1"'
 xymonsettings.sh skins
 xymonsettings.sh skin accessible
 xymonsettings.sh animation off
+xymonsettings.sh layout modern
 .fi
 
 .SH "SEE ALSO"
