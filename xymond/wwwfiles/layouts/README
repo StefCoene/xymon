@@ -7,6 +7,13 @@ script can, on top of the HTML every page already has. It does not change
 what the pages show.
 
 classic: the pages as they have always been; both files are empty.
+modern: a dark page with the groups of hosts as cards and the menu as one
+    bar across the top, its bottom edge in the colour of the page. Its
+    script adds a summary bar below the top line: a count per colour, and
+    of recent and acknowledged statuses, where a click shows only the rows
+    with that status, and a countdown to the next refresh that can be
+    paused. It finds the statuses by their icons' xmdot-<colour> classes,
+    or by the icons' file names on pages that have no classes.
 
 A layout's script may take over the page refresh: the six headers that
 refresh their page keep the <meta refresh> inside <noscript> and start a

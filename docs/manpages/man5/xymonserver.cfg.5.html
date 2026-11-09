@@ -459,9 +459,11 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
   <dd>URL prefix (without hostname) of the page layout: every Xymon page loads
       layout.css and layout.js from it, after the stylesheet XYMONBODYCSS names.
       Default: &quot;$XYMONSERVERWWWURL/layouts/classic&quot;, which adds
-      nothing to the pages. A page whose header template does not load the
-      layout -- one changed locally before this setting existed -- is not
-      affected.
+      nothing to the pages. &quot;$XYMONSERVERWWWURL/layouts/modern&quot; gives
+      them a summary bar with a count per colour and a countdown to the next
+      refresh that can be paused, and restyles the menu and the groups of hosts.
+      A page whose header template does not load the layout -- one changed
+      locally before this setting existed -- is not affected.
     <p class="Pp"></p>
   </dd>
   <dt id="XYMONHELPSKIN"><a class="permalink" href="#XYMONHELPSKIN"><b>XYMONHELPSKIN</b></a></dt>

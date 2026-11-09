@@ -1,0 +1,228 @@
+/* The modern Xymon layout, on top of xymonbody.css; see ../README.
+ *
+ * A dark page, the groups of hosts as cards, the menu as one bar whose
+ * bottom edge has the colour of the page, and the styles for the summary
+ * bar and refresh countdown that layout.js adds. Without JavaScript the
+ * pages still get the look, without the bar.
+ */
+
+:root {
+	--xm-bg: #0d1117;
+	--xm-panel: #161b22;
+	--xm-panel-2: #1c2230;
+	--xm-border: #30363d;
+	--xm-text: #c9d1d9;
+	--xm-strong: #e6edf3;
+	--xm-muted: #8b949e;
+	--xm-link: #58a6ff;
+	--xm-red: #f85149;
+	--xm-yellow: #d29922;
+	--xm-purple: #a371f7;
+	--xm-blue: #58a6ff;
+	--xm-clear: #8b949e;
+	--xm-green: #3fb950;
+	color-scheme: dark;
+}
+
+body {
+	background: var(--xm-bg) !important;
+	background-image: none !important;
+	color: var(--xm-text);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	margin: 0 16px 16px;
+	padding-top: 48px;		/* room for the menu bar */
+	--xm-page: var(--xm-clear);
+}
+body.green  { --xm-page: var(--xm-green); }
+body.yellow { --xm-page: var(--xm-yellow); }
+body.red    { --xm-page: var(--xm-red); }
+body.purple { --xm-page: var(--xm-purple); }
+body.blue   { --xm-page: var(--xm-blue); }
+
+/* The menu (#menue, from xymonmenu.cfg) as one bar across the top, its
+ * bottom edge in the colour of the page; each menu opens below its name. */
+#menue {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 40px;
+	display: flex;
+	align-items: stretch;
+	padding: 0 8px;
+	background: var(--xm-panel);
+	border-bottom: 4px solid var(--xm-page);
+	box-shadow: 0 2px 6px rgba(0,0,0,.5);
+	z-index: 200;
+}
+#menue .outer,
+#menue .outerleft,
+#menue .outerright {
+	float: none;
+	position: relative;
+	width: auto;
+	height: 40px;
+	overflow: visible;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	font: 14px system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+#menue span.menutag {
+	display: flex;
+	align-items: center;
+	height: 40px;
+	padding: 0 14px;
+	border-radius: 6px 6px 0 0;
+}
+#menue span.menutag a:link,
+#menue span.menutag a:visited { color: var(--xm-text); text-decoration: none; }
+#menue span.menutag a::after { content: " \25BE"; color: var(--xm-muted); }
+#menue .outer:hover span.menutag,
+#menue .outerleft:hover span.menutag,
+#menue .outerright:hover span.menutag { background: var(--xm-panel-2); }
+#menue a.inner,
+#menue a.inner-1 {
+	display: none;
+	width: auto;
+	min-width: 220px;
+	margin: 0;
+	padding: 7px 14px;
+	white-space: nowrap;
+	border: 0;
+	border-left: 1px solid var(--xm-border);
+	border-right: 1px solid var(--xm-border);
+	background: var(--xm-panel-2);
+	color: var(--xm-text);
+	text-decoration: none;
+}
+#menue a.inner-1 { border-top: 1px solid var(--xm-border); }
+#menue a.inner:last-of-type { border-bottom: 1px solid var(--xm-border); border-radius: 0 0 6px 6px; }
+#menue .outer:hover a.inner,
+#menue .outer:hover a.inner-1,
+#menue .outerleft:hover a.inner,
+#menue .outerleft:hover a.inner-1,
+#menue .outerright:hover a.inner,
+#menue .outerright:hover a.inner-1 { display: block; }
+#menue a.inner:hover,
+#menue a.inner-1:hover { background: #283040; color: var(--xm-strong); }
+/* The top line's first row only made room for the old menu. */
+table[summary="Topline"] tr:first-child { display: none; }
+
+/* The old pages set fonts and colours with <FONT>; let the stylesheet win. */
+font {
+	font-family: inherit !important;
+	color: inherit !important;
+}
+a:link,
+a:visited { color: var(--xm-link); text-decoration: none; }
+a:hover   { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--xm-border); }
+
+/* Top line: logo, title, date. */
+table[summary="Topline"] td { color: var(--xm-strong); }
+table[summary="Topline"] font[size="+1"] { font-size: 15px; letter-spacing: .01em; }
+/* The old templates and xymongen wrap titles, host names and column
+ * headings in <B>; bold in a system font is heavy, so they get a medium
+ * weight instead. */
+table[summary="Topline"] b,
+table[summary="Bottomline"] b,
+table[summary$="Group Block"] b { font-weight: 500; }
+table[summary="Bottomline"] { opacity: .6; }
+
+/* Every group of hosts as a card. */
+table[summary$="Group Block"] {
+	background: var(--xm-panel);
+	border: 1px solid var(--xm-border);
+	border-radius: 8px;
+	border-collapse: separate;
+	border-spacing: 0;
+	padding: 6px 8px;
+	margin: 4px auto;
+	box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+/* xymongen separates the groups with a <BR> and an anchor that holds a
+ * whole line of text; keep the anchor, as a jump target, but at no height. */
+center + br { display: none; }
+a[name^="hosts-blk"] {
+	display: block;
+	height: 0;
+	overflow: hidden;
+	font-size: 0;
+	line-height: 0;
+}
+table[summary$="Group Block"] td,
+table[summary$="Group Block"] th {
+	padding: 3px 6px;
+	border-bottom: 1px solid rgba(48,54,61,.5);
+}
+table[summary$="Group Block"] tr:last-child td { border-bottom: 0; }
+table[summary$="Group Block"] tr:hover td { background: var(--xm-panel-2); }
+/* The host names (XYMONPAGEROWFONT) and the column headings. */
+table[summary$="Group Block"] td font[size="+1"] {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--xm-strong) !important;
+}
+table[summary$="Group Block"] a font[size="-1"] { font-size: 12px; color: var(--xm-muted) !important; }
+table[summary$="Group Block"] a:hover font[size="-1"] { color: var(--xm-link) !important; }
+
+/* Rows hidden by a click on a summary card. */
+tr.xm-hidden { display: none; }
+
+/* The summary bar modern.js adds below the top line. */
+#xm-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: stretch;
+	margin: 10px 0 14px;
+}
+.xm-card {
+	min-width: 84px;
+	padding: 8px 14px;
+	background: var(--xm-panel);
+	border: 1px solid var(--xm-border);
+	border-left: 4px solid var(--xm-c, var(--xm-border));
+	border-radius: 8px;
+	cursor: pointer;
+	user-select: none;
+	color: var(--xm-text);
+	font: inherit;
+	text-align: left;
+}
+.xm-card:hover { background: var(--xm-panel-2); }
+.xm-card.xm-active { outline: 2px solid var(--xm-c, var(--xm-link)); }
+.xm-card.xm-zero { opacity: .45; }
+.xm-card .xm-n { display: block; font-size: 24px; font-weight: 600; line-height: 1.1; color: var(--xm-c, var(--xm-strong)); }
+.xm-card .xm-l { display: block; font-size: 12px; color: var(--xm-muted); }
+.xm-spacer { flex: 1; }
+.xm-tool {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	background: var(--xm-panel);
+	border: 1px solid var(--xm-border);
+	border-radius: 8px;
+	color: var(--xm-muted);
+	font-size: 13px;
+}
+.xm-tool button {
+	background: var(--xm-panel-2);
+	border: 1px solid var(--xm-border);
+	border-radius: 6px;
+	color: var(--xm-strong);
+	padding: 3px 10px;
+	cursor: pointer;
+	font: inherit;
+}
+.xm-tool button:hover { border-color: var(--xm-link); }
+.xm-tool .xm-count { font-variant-numeric: tabular-nums; color: var(--xm-strong); min-width: 3ch; text-align: right; }
+.xm-tool.xm-paused { border-color: var(--xm-yellow); }
+.xm-tool.xm-paused .xm-count { color: var(--xm-yellow); }
+
+@media print { #xm-bar { display: none !important; } }
