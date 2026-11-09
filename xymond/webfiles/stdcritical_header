@@ -2,12 +2,22 @@
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="&HTMLCONTENTTYPE">
-<META HTTP-EQUIV="REFRESH" CONTENT="&XYMWEBREFRESH">
+<noscript><META HTTP-EQUIV="REFRESH" CONTENT="&XYMWEBREFRESH"></noscript>
+<script type="text/javascript">
+/* Reload as the meta tag above does without JavaScript; a layout may
+ * replace this timer (window.xymonRefreshTimer) with its own. */
+var xymonRefresh = parseInt("&XYMWEBREFRESH", 10) || 0;
+if (xymonRefresh > 0) window.xymonRefreshTimer = setTimeout(function () { window.location.reload(); }, xymonRefresh * 1000);
+</script>
 <META HTTP-EQUIV="EXPIRES" CONTENT="Sat, 01 Jan 2001 00:00:00 GMT">
 <TITLE>&XYMWEBBACKGROUND : Xymon - Status @ &XYMWEBDATE</TITLE>
 
 <!-- Styles for the Xymon body  -->
 <link rel="stylesheet" type="text/css" href="&XYMONBODYCSS">
+
+<!-- The page layout, see XYMONLAYOUT in xymonserver.cfg(5) -->
+<link rel="stylesheet" type="text/css" href="&XYMONLAYOUT/layout.css">
+<script type="text/javascript" src="&XYMONLAYOUT/layout.js"></script>
 
 <!-- Styles for the menu bar -->
 <link rel="stylesheet" type="text/css" href="&XYMONBODYMENUCSS">

@@ -85,6 +85,7 @@ XYMONWEBHOSTURL="$XYMONWEBHOST$XYMONSERVERWWWURL"	# Prefix for all static Xymon 
 XYMONWEBHTMLLOGS="$XYMONWEBHOSTURL/html"	# Prefix for the Xymon HTML logs (only if XYMONLOGSTATUS=STATIC)
 XYMONWEB="$XYMONSERVERWWWURL"			# Xymon URL prefix without the host part
 XYMONSKIN="$XYMONSERVERWWWURL/gifs"		# Xymon URL prefix for the GIF files
+XYMONLAYOUT="$XYMONSERVERWWWURL/layouts/classic"	# Xymon URL prefix for the page layout (layout.css, layout.js)
 XYMONHELPSKIN="$XYMONSERVERWWWURL/help"         # Xymon URL prefix for the online help files.
 XYMONNOTESSKIN="$XYMONSERVERWWWURL/notes"       # Xymon URL prefix for the online notes-files.
 XYMONMENUSKIN="$XYMONSERVERWWWURL/menu"         # Xymon URL prefix for the webpage menu files.

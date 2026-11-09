@@ -1,0 +1,17 @@
+Page layouts for the Xymon web pages.
+
+Every page header loads layout.css and layout.js from the directory that
+XYMONLAYOUT in xymonserver.cfg names, after xymonbody.css; see
+xymonserver.cfg(5). A layout changes how the pages look and adds what a
+script can, on top of the HTML every page already has. It does not change
+what the pages show.
+
+classic: the pages as they have always been; both files are empty.
+
+A layout's script may take over the page refresh: the six headers that
+refresh their page keep the <meta refresh> inside <noscript> and start a
+plain reload timer, window.xymonRefreshTimer, which the script can clear
+and replace; window.xymonRefresh holds the interval in seconds.
+
+Both files are plain ASCII: the pages may be served without a character
+set, and a browser then reads them in its own default one.

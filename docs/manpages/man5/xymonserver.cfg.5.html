@@ -455,6 +455,15 @@ Section: File Formats (5)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a href="#
       pages without movement, or run &quot;xymonsettings.sh animation off&quot;.
     <p class="Pp"></p>
   </dd>
+  <dt id="XYMONLAYOUT"><a class="permalink" href="#XYMONLAYOUT"><b>XYMONLAYOUT</b></a></dt>
+  <dd>URL prefix (without hostname) of the page layout: every Xymon page loads
+      layout.css and layout.js from it, after the stylesheet XYMONBODYCSS names.
+      Default: &quot;$XYMONSERVERWWWURL/layouts/classic&quot;, which adds
+      nothing to the pages. A page whose header template does not load the
+      layout -- one changed locally before this setting existed -- is not
+      affected.
+    <p class="Pp"></p>
+  </dd>
   <dt id="XYMONHELPSKIN"><a class="permalink" href="#XYMONHELPSKIN"><b>XYMONHELPSKIN</b></a></dt>
   <dd>URL prefix (without hostname) of the Xymon on-line help files. E.g
       &quot;/xymon/help&quot;.

@@ -369,6 +369,14 @@ directory with the same icons standing still, such as
 "$XYMONSERVERWWWURL/gifs/static": point XYMONSKIN at it for pages
 without movement, or run "xymonsettings.sh animation off".
 
+.IP "\fBXYMONLAYOUT\fR"
+URL prefix (without hostname) of the page layout: every Xymon page loads
+layout.css and layout.js from it, after the stylesheet XYMONBODYCSS
+names. Default: "$XYMONSERVERWWWURL/layouts/classic", which adds nothing
+to the pages. A page whose header template does
+not load the layout -- one changed locally before this setting existed
+-- is not affected.
+
 .IP "\fBXYMONHELPSKIN\fR"
 URL prefix (without hostname) of the Xymon on-line help files. E.g "/xymon/help".
 

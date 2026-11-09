@@ -9,6 +9,10 @@
 <!-- Styles for the Xymon body  -->
 <link rel="stylesheet" type="text/css" href="&XYMONBODYCSS">
 
+<!-- The page layout, see XYMONLAYOUT in xymonserver.cfg(5) -->
+<link rel="stylesheet" type="text/css" href="&XYMONLAYOUT/layout.css">
+<script type="text/javascript" src="&XYMONLAYOUT/layout.js"></script>
+
 <!-- Styles for the menu bar -->
 <link rel="stylesheet" type="text/css" href="&XYMONBODYMENUCSS">
 
