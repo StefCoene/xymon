@@ -1,0 +1,6 @@
+# The page layouts in this directory, one name per line, that the Look
+# and feel page (lookandfeel/) offers. Add the name of a layout you
+# install here to preview it there.
+classic
+minimal
+modern

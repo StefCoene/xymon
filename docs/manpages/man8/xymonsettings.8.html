@@ -50,6 +50,11 @@ Section: Maintenance Commands (8)<br/>Updated: Version 4.3.31: 6 Nov 2026<br/><a
     quotes, a &quot;#&quot; or a backslash as it is. A reference to another
     setting, such as &quot;$XYMONSERVERWWWURL&quot;, is shown and written as it
     stands: the programs replace it when they load the file.</p>
+<p class="Pp">The &quot;Look and feel&quot; page of the web interface
+    ($XYMONSERVERWWWURL/lookandfeel/, in the Administration menu) previews a
+    layout and an icon set on a real page, and shows the <b>layout</b>,
+    <b>skin</b> and <b>animation</b> commands that make the choice
+  permanent.</p>
 <p class="Pp">Programs read xymonserver.cfg when they start. After a <b>set</b>,
     <a href="../man1/xymongen.1.html">xymongen</a>(1) and the CGI programs use the new value at their next run; the
     programs that keep running, such as <a href="../man8/xymond.8.html">xymond</a>(8) and its channel workers, use

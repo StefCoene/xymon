@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xymon - Look and feel</title>
+<link rel="stylesheet" type="text/css" href="lookandfeel.css">
+<script type="text/javascript" src="lookandfeel.js"></script>
+</head>
+<body>
+<div id="lf-side">
+  <h1>Look and feel</h1>
+  <p class="lf-note">Try a layout and an icon set on a real Xymon page. Nothing
+  changes on the server: <b>Save</b> shows the commands that make the choice
+  permanent.</p>
+
+  <label for="lf-page">Page</label>
+  <select id="lf-page">
+    <option value="xymon.html">Main view</option>
+    <option value="nongreen.html">All non-green view</option>
+  </select>
+
+  <label for="lf-layout">Layout</label>
+  <select id="lf-layout"></select>
+
+  <div id="lf-style-box" hidden>
+    <label for="lf-style">Icon style</label>
+    <select id="lf-style">
+      <option value="image">Images</option>
+      <option value="text">Characters (ICONSTYLE=text)</option>
+    </select>
+  </div>
+
+  <div id="lf-image-box">
+    <label for="lf-skin">Icons</label>
+    <select id="lf-skin"></select>
+    <div class="lf-row">
+      <input id="lf-other" type="text" placeholder="other skin: directory in skins/" spellcheck="false">
+      <button id="lf-add" type="button">Add</button>
+    </div>
+
+    <label class="lf-check"><input id="lf-anim" type="checkbox"> Animated icons</label>
+    <div id="lf-anim-note" class="lf-note"></div>
+  </div>
+
+  <div id="lf-current" class="lf-note"></div>
+
+  <button id="lf-save" type="button" class="lf-primary">Save</button>
+  <div id="lf-saved" hidden>
+    <p class="lf-note">Run these on the Xymon server, as the Xymon user; see
+    xymonsettings(8). The overview pages change at the next xymongen run, the
+    other pages at once.</p>
+    <pre id="lf-cmds"></pre>
+    <button id="lf-copy" type="button">Copy</button>
+  </div>
+  <div id="lf-error" class="lf-error" hidden></div>
+</div>
+<iframe id="lf-frame" title="Preview"></iframe>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# The icon sets in this directory, one name per line, that the Look and
+# feel page (lookandfeel/) offers besides the classic one (gifs). Add the name of
+# a set you install here to preview it there.
+accessible
+vector

@@ -23,5 +23,8 @@ refresh their page keep the <meta refresh> inside <noscript> and start a
 plain reload timer, window.xymonRefreshTimer, which the script can clear
 and replace; window.xymonRefresh holds the interval in seconds.
 
+index.txt lists the layouts here, for the Look and feel page, which
+previews them; add the name of a layout you install.
+
 Both files are plain ASCII: the pages may be served without a character
 set, and a browser then reads them in its own default one.

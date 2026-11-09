@@ -1,0 +1,76 @@
+/* The Look and feel page: the choices on the left, the preview filling
+ * the rest. See index.html and lookandfeel.js. */
+
+html, body {
+	height: 100%;
+	margin: 0;
+	background: #0d1117;
+	color: #c9d1d9;
+	font: 14px system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	color-scheme: dark;
+}
+body { display: flex; }
+
+#lf-side {
+	flex: 0 0 280px;
+	padding: 16px;
+	overflow-y: auto;
+	background: #161b22;
+	border-right: 1px solid #30363d;
+	box-sizing: border-box;
+}
+#lf-side h1 { margin: 0 0 8px; font-size: 18px; color: #e6edf3; }
+#lf-side label { display: block; margin: 14px 0 4px; color: #e6edf3; font-weight: 600; }
+#lf-side label.lf-check { font-weight: normal; }
+#lf-side select,
+#lf-side input[type=text] {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 6px 8px;
+	background: #0d1117;
+	color: #e6edf3;
+	border: 1px solid #30363d;
+	border-radius: 6px;
+	font: inherit;
+}
+.lf-row { display: flex; gap: 6px; margin-top: 6px; }
+.lf-row input { flex: 1; }
+#lf-side button {
+	padding: 6px 12px;
+	background: #1c2230;
+	color: #e6edf3;
+	border: 1px solid #30363d;
+	border-radius: 6px;
+	cursor: pointer;
+	font: inherit;
+}
+#lf-side button:hover { border-color: #58a6ff; }
+#lf-side button.lf-primary {
+	display: block;
+	width: 100%;
+	margin-top: 18px;
+	background: #238636;
+	border-color: #2ea043;
+	font-weight: 600;
+}
+.lf-note { color: #8b949e; font-size: 13px; line-height: 1.4; }
+#lf-current { margin-top: 14px; }
+#lf-cmds {
+	margin: 8px 0;
+	padding: 8px;
+	background: #0d1117;
+	border: 1px solid #30363d;
+	border-radius: 6px;
+	white-space: pre-wrap;
+	color: #e6edf3;
+	font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.lf-error { margin-top: 12px; color: #f85149; }
+
+#lf-frame { flex: 1; border: 0; height: 100%; background: #000; }
+
+@media (max-width: 700px) {
+	body { flex-direction: column; }
+	#lf-side { flex: none; border-right: 0; border-bottom: 1px solid #30363d; }
+	#lf-frame { height: 70vh; }
+}
