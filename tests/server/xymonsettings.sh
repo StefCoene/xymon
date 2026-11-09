@@ -183,6 +183,7 @@ cmp -s "$work/before.cfg" "$cfg" || fail "a refused skin changed the file"
 
 # layouts and layout
 assert_equal "* classic
+  minimal
   modern" "$(xs -c "$cfg" -w "$work/www" layouts)" "layouts with the shipped XYMONLAYOUT"
 xs -c "$cfg" -w "$work/www" layout modern >/dev/null
 assert_equal '$XYMONSERVERWWWURL/layouts/modern' "$(xs -c "$cfg" get XYMONLAYOUT)" "layout modern"

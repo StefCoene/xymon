@@ -7,6 +7,9 @@ script can, on top of the HTML every page already has. It does not change
 what the pages show.
 
 classic: the pages as they have always been; both files are empty.
+minimal: as little as possible -- a flat dark page, a small system font,
+    compact tables without frames, the menu as a plain row of words, and
+    the colour of the page as a thin line at the top. No script.
 modern: a dark page with the groups of hosts as cards and the menu as one
     bar across the top, its bottom edge in the colour of the page. Its
     script adds a summary bar below the top line: a count per colour, and

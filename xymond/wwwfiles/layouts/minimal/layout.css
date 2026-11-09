@@ -1,0 +1,90 @@
+/* The minimal Xymon layout, on top of xymonbody.css; see ../README.
+ *
+ * As little as possible: a flat dark page, a small system font, compact
+ * tables without frames, the menu as a plain row of words, and the colour
+ * of the page as a thin line at the very top. No script.
+ */
+
+:root { color-scheme: dark; }
+
+body {
+	background: #111 !important;
+	background-image: none !important;
+	color: #c8c8c8;
+	font: 13px system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	margin: 0 12px 12px;
+	padding-top: 26px;		/* room for the menu row */
+	border-top: 2px solid #777;
+}
+body.green  { border-top-color: #3fb950; }
+body.yellow { border-top-color: #d29922; }
+body.red    { border-top-color: #e5534b; }
+body.purple { border-top-color: #a371f7; }
+body.blue   { border-top-color: #58a6ff; }
+
+/* The old templates set fonts and colours with <FONT> and <B>. */
+font { font-family: inherit !important; color: inherit !important; }
+b { font-weight: 500; }
+a:link, a:visited { color: #8ab4f8; text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid #2a2a2a; }
+
+/* The menu: a row of words; each opens a plain list below it. */
+#menue {
+	position: absolute;
+	top: 2px;
+	left: 12px;
+	right: 12px;
+	display: flex;
+	gap: 18px;
+	height: 22px;
+	align-items: center;
+	z-index: 200;
+}
+#menue .outer, #menue .outerleft, #menue .outerright {
+	float: none;
+	position: relative;
+	width: auto;
+	height: 22px;
+	overflow: visible;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	font: inherit;
+}
+#menue span.menutag { display: flex; align-items: center; height: 22px; }
+#menue span.menutag a:link, #menue span.menutag a:visited { color: #999; }
+#menue a.inner, #menue a.inner-1 {
+	display: none;
+	width: auto;
+	min-width: 180px;
+	margin: 0;
+	padding: 3px 8px;
+	white-space: nowrap;
+	border: 0;
+	background: #1b1b1b;
+	color: #c8c8c8;
+}
+#menue .outer:hover a.inner, #menue .outer:hover a.inner-1,
+#menue .outerleft:hover a.inner, #menue .outerleft:hover a.inner-1,
+#menue .outerright:hover a.inner, #menue .outerright:hover a.inner-1 { display: block; }
+#menue a.inner:hover, #menue a.inner-1:hover { background: #262626; text-decoration: none; }
+
+/* The top line: small; its first row only made room for the old menu. */
+table[summary="Topline"] tr:first-child { display: none; }
+table[summary="Topline"] font[size="+1"] { font-size: 13px; color: #999 !important; }
+table[summary="Topline"] hr { display: none; }
+table[summary="Bottomline"] { opacity: .4; }
+
+/* The groups of hosts: no frames, little padding, little space between. */
+table[summary$="Group Block"] { margin: 2px auto; border-collapse: collapse; }
+table[summary$="Group Block"] td { padding: 1px 4px; }
+table[summary$="Group Block"] tr:hover td { background: #1a1a1a; }
+table[summary$="Group Block"] td font[size="+1"] { font-size: 13px; color: #ddd !important; }
+table[summary$="Group Block"] a font[size="-1"] { font-size: 11px; color: #777 !important; }
+center + br { display: none; }
+a[name^="hosts-blk"] { display: block; height: 0; overflow: hidden; font-size: 0; line-height: 0; }
+
+@media print { #menue { display: none; } }
